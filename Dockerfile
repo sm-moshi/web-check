@@ -1,4 +1,4 @@
-# syntax=docker/dockerfile:1.7
+# syntax=docker/dockerfile:1.20
 
 ARG NODE_VERSION=22.21.1
 ARG DEBIAN_VERSION=trixie-slim
@@ -8,32 +8,26 @@ ARG DEBIAN_VERSION=trixie-slim
 # ----------------------------
 FROM node:${NODE_VERSION}-${DEBIAN_VERSION} AS build
 SHELL ["/bin/bash", "-euo", "pipefail", "-c"]
-
 WORKDIR /app
 
-# Tooling for native modules (kept out of runtime image)
+# native build tooling (kept out of runtime image)
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
-    python3 \
-    make \
-    g++ \
-    git \
-    ca-certificates \
+    python3 make g++ git ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-# Yarn via Corepack
+# Yarn via Corepack (repo currently ends up using yarn classic)
 RUN corepack enable
 
-# IMPORTANT for multi-arch:
-# Prevent puppeteer (and puppeteer-core consumers) from downloading Chromium during install
+# IMPORTANT for multi-arch: prevent puppeteer from downloading chromium during install
 ENV PUPPETEER_SKIP_DOWNLOAD=1 \
     PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=1
 
-# Install deps (cache-friendly)
+# deps first (cache)
 COPY package.json yarn.lock .yarnrc.yml ./
-RUN yarn install --immutable
+RUN yarn install --frozen-lockfile
 
-# Build
+# build
 COPY . .
 RUN yarn build
 
@@ -42,6 +36,7 @@ RUN yarn build
 # ----------------------------
 FROM node:${NODE_VERSION}-${DEBIAN_VERSION} AS final
 SHELL ["/bin/bash", "-euo", "pipefail", "-c"]
+WORKDIR /app
 
 ENV NODE_ENV=production \
     CHROME_PATH=/usr/bin/chromium \
@@ -49,28 +44,31 @@ ENV NODE_ENV=production \
     PUPPETEER_SKIP_DOWNLOAD=1 \
     PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=1
 
-WORKDIR /app
-
-# Runtime deps:
-# - chromium: required since we skip Puppeteer's download
-# - dumb-init: clean PID 1
+# runtime deps (chromium is the big one; unavoidable for single-container design)
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
-    dumb-init \
-    ca-certificates \
-    chromium \
-    fonts-liberation \
-    fontconfig \
+    dumb-init ca-certificates \
+    chromium fonts-liberation fontconfig \
     && rm -rf /var/lib/apt/lists/*
 
-# Unprivileged user
+# Yarn via Corepack
+RUN corepack enable
+
+# create unprivileged user
 RUN useradd --create-home --uid 10001 --shell /usr/sbin/nologin webcheck
 
-# Copy app from build stage (avoid guessing Astro output paths)
-COPY --from=build /app /app
+# install ONLY production deps (no dev deps)
+COPY package.json yarn.lock .yarnrc.yml ./
+RUN yarn install --frozen-lockfile --production=true \
+    && yarn cache clean --all || true
+
+# copy only runtime artifacts
+COPY --from=build /app/dist ./dist
+COPY --from=build /app/public ./public
+COPY --from=build /app/api ./api
+COPY --from=build /app/server.js ./server.js
 
 USER webcheck
-
 EXPOSE 3000
 
 ENTRYPOINT ["dumb-init", "--"]
