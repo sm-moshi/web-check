@@ -22,8 +22,9 @@ const unwrapEnvVar = (varName, fallbackValue) => {
 // Determine the deploy target (vercel, netlify, cloudflare, node)
 const deployTarget = unwrapEnvVar('PLATFORM', 'node').toLowerCase();
 
-// Determine the output mode (server, hybrid or static)
-const output = unwrapEnvVar('OUTPUT', 'hybrid');
+// Determine the output mode (server or static)
+// Note: 'hybrid' was removed in Astro 5. Use 'server' for SSR with optional prerendering.
+const output = unwrapEnvVar('OUTPUT', 'server');
 
 // The FQDN of where the site is hosted (used for sitemaps & canonical URLs)
 const site = unwrapEnvVar('SITE_URL', 'https://check.m0sh1.cc');
@@ -75,5 +76,20 @@ if (!isBossServer && isBossServer !== true) {
 }
 
 // Export Astro configuration
-export default defineConfig({ output, base, integrations, site, adapter, redirects });
+export default defineConfig({ 
+  output, 
+  base, 
+  integrations, 
+  site, 
+  adapter, 
+  redirects,
+  vite: {
+    resolve: {
+      conditions: ['svelte', 'import', 'module', 'browser', 'default'],
+    },
+    ssr: {
+      noExternal: ['@fortawesome/svelte-fontawesome'],
+    },
+  },
+});
 
