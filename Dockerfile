@@ -1,62 +1,77 @@
-# Specify the Node.js version to use
-ARG NODE_VERSION=22.21.1
+# syntax=docker/dockerfile:1.7
 
-# Specify the Debian version to use, the default is "bullseye"
+ARG NODE_VERSION=22.21.1
 ARG DEBIAN_VERSION=trixie-slim
 
-# Use Node.js Docker image as the base image, with specific Node and Debian versions
+# ----------------------------
+# Build stage
+# ----------------------------
 FROM node:${NODE_VERSION}-${DEBIAN_VERSION} AS build
-
-# Set the container's default shell to Bash and enable some options
 SHELL ["/bin/bash", "-euo", "pipefail", "-c"]
 
-# Install Chromium browser and Download and verify Google Chrome’s signing key
-RUN apt-get update -qq --fix-missing && \
-    apt-get -qqy install --allow-unauthenticated gnupg wget && \
-    wget --quiet --output-document=- https://dl-ssl.google.com/linux/linux_signing_key.pub | gpg --dearmor > /etc/apt/trusted.gpg.d/google-archive.gpg && \
-    echo "deb http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google.list && \
-    apt-get update -qq && \
-    apt-get -qqy --no-install-recommends install chromium traceroute python make g++ && \
-    rm -rf /var/lib/apt/lists/*
-
-# Run the Chromium browser's version command and redirect its output to the /etc/chromium-version file
-RUN /usr/bin/chromium --no-sandbox --version > /etc/chromium-version
-
-# Set the working directory to /app
 WORKDIR /app
 
-# Copy package.json and yarn.lock to the working directory
-COPY package.json yarn.lock ./
+# Tooling for native modules (kept out of runtime image)
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+    python3 \
+    make \
+    g++ \
+    git \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
 
-# Run yarn install to install dependencies and clear yarn cache
-RUN apt-get update && \
-    yarn install --frozen-lockfile --network-timeout 100000 && \
-    rm -rf /app/node_modules/.cache
+# Yarn via Corepack
+RUN corepack enable
 
-# Copy all files to working directory
+# IMPORTANT for multi-arch:
+# Prevent puppeteer (and puppeteer-core consumers) from downloading Chromium during install
+ENV PUPPETEER_SKIP_DOWNLOAD=1 \
+    PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=1
+
+# Install deps (cache-friendly)
+COPY package.json yarn.lock .yarnrc.yml ./
+RUN yarn install --immutable
+
+# Build
 COPY . .
+RUN yarn build
 
-# Run yarn build to build the application
-RUN yarn build --production
+# ----------------------------
+# Runtime stage
+# ----------------------------
+FROM node:${NODE_VERSION}-${DEBIAN_VERSION} AS final
+SHELL ["/bin/bash", "-euo", "pipefail", "-c"]
 
-# Final stage
-FROM node:${NODE_VERSION}-${DEBIAN_VERSION}  AS final
+ENV NODE_ENV=production \
+    CHROME_PATH=/usr/bin/chromium \
+    PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium \
+    PUPPETEER_SKIP_DOWNLOAD=1 \
+    PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=1
 
 WORKDIR /app
 
-COPY package.json yarn.lock ./
-COPY --from=build /app .
+# Runtime deps:
+# - chromium: required since we skip Puppeteer's download
+# - dumb-init: clean PID 1
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+    dumb-init \
+    ca-certificates \
+    chromium \
+    fonts-liberation \
+    fontconfig \
+    && rm -rf /var/lib/apt/lists/*
 
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends chromium traceroute && \
-    chmod 755 /usr/bin/chromium && \
-    rm -rf /var/lib/apt/lists/* /app/node_modules/.cache
+# Unprivileged user
+RUN useradd --create-home --uid 10001 --shell /usr/sbin/nologin webcheck
 
-# Exposed container port, the default is 3000, which can be modified through the environment variable PORT
-EXPOSE ${PORT:-3000}
+# Copy app from build stage (avoid guessing Astro output paths)
+COPY --from=build /app /app
 
-# Set the environment variable CHROME_PATH to specify the path to the Chromium binaries
-ENV CHROME_PATH='/usr/bin/chromium'
+USER webcheck
 
-# Define the command executed when the container starts and start the server.js of the Node.js application
+EXPOSE 3000
+
+ENTRYPOINT ["dumb-init", "--"]
 CMD ["yarn", "start"]

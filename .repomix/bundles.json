@@ -4,7 +4,7 @@
       "name": "web-check",
       "configPath": ".repomix/config/web-check-repomix.config.json",
       "created": "2025-12-23T06:52:30.122Z",
-      "lastUsed": "2025-12-23T07:08:28.733Z",
+      "lastUsed": "2025-12-23T09:37:19.004Z",
       "tags": [],
       "files": [
         "api",
@@ -35,7 +35,10 @@
         "src/pages",
         "src/styles",
         "src/web-check-live",
-        "src/env.d.ts"
+        "src/env.d.ts",
+        "mise.toml",
+        ".yarnrc.yml",
+        ".astro"
       ]
     }
   }
