@@ -1,8 +1,8 @@
 # Specify the Node.js version to use
-ARG NODE_VERSION=21
+ARG NODE_VERSION=22.21.1
 
 # Specify the Debian version to use, the default is "bullseye"
-ARG DEBIAN_VERSION=bullseye
+ARG DEBIAN_VERSION=trixie-slim
 
 # Use Node.js Docker image as the base image, with specific Node and Debian versions
 FROM node:${NODE_VERSION}-${DEBIAN_VERSION} AS build
@@ -14,7 +14,7 @@ SHELL ["/bin/bash", "-euo", "pipefail", "-c"]
 RUN apt-get update -qq --fix-missing && \
     apt-get -qqy install --allow-unauthenticated gnupg wget && \
     wget --quiet --output-document=- https://dl-ssl.google.com/linux/linux_signing_key.pub | gpg --dearmor > /etc/apt/trusted.gpg.d/google-archive.gpg && \
-    echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google.list && \
+    echo "deb http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google.list && \
     apt-get update -qq && \
     apt-get -qqy --no-install-recommends install chromium traceroute python make g++ && \
     rm -rf /var/lib/apt/lists/*
