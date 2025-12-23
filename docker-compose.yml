@@ -2,7 +2,7 @@ version: '3.9'
 services:
   web-check:
     container_name: Web-Check
-    image: lissy93/web-check
+    image: lissy93/web-check@sha256:f2d1dc726958c1d79ac459cac84eb26eb4f203a4d27447f336695a8c1884f1e3
     ports:
       - 3000:3000
     restart: unless-stopped
