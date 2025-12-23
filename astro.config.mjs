@@ -10,7 +10,6 @@ import sitemap from '@astrojs/sitemap';
 import vercelAdapter from '@astrojs/vercel/serverless';
 import netlifyAdapter from '@astrojs/netlify';
 import nodeAdapter from '@astrojs/node';
-import cloudflareAdapter from '@astrojs/cloudflare';
 
 // Helper function to unwrap both Vite and Node environment variables
 const unwrapEnvVar = (varName, fallbackValue) => {
@@ -46,8 +45,6 @@ function getAdapter(target) {
       return vercelAdapter();
     case 'netlify':
       return netlifyAdapter();
-    case 'cloudflare':
-      return cloudflareAdapter();
     case 'node':
       return nodeAdapter({ mode: 'middleware' });
     default:
@@ -93,4 +90,3 @@ export default defineConfig({
     },
   },
 });
-
