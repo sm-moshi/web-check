@@ -19,15 +19,15 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
 
     - name: Setup Node.js
-      uses: actions/setup-node@v4
+      uses: actions/setup-node@395ad3262231945c25e8478fd5baf05154b1d79f # v6
       with:
-        node-version: 16
+        node-version: 22.21.1
 
     - name: Cache node_modules
-      uses: actions/cache@v4
+      uses: actions/cache@9255dc7a253b0ccc959486e2bca901246202afeb # v5
       with:
         path: node_modules
         key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
@@ -56,7 +56,7 @@ jobs:
       
     - name: Update GitHub deployment status (API)
       if: always()
-      uses: chrnorm/deployment-status@v2
+      uses: chrnorm/deployment-status@9a72af4586197112e0491ea843682b5dc280d806 # v2
       with:
         token: ${{ secrets.BOT_TOKEN || secrets.GITHUB_TOKEN }}
         state: "${{ job.status }}"
@@ -68,15 +68,15 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
 
     - name: Setup Node.js
-      uses: actions/setup-node@v4
+      uses: actions/setup-node@395ad3262231945c25e8478fd5baf05154b1d79f # v6
       with:
-        node-version: 16
+        node-version: 24
     
     - name: Cache node_modules
-      uses: actions/cache@v4
+      uses: actions/cache@9255dc7a253b0ccc959486e2bca901246202afeb # v5
       with:
         path: node_modules
         key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
@@ -84,7 +84,7 @@ jobs:
           ${{ runner.os }}-yarn-
 
     - name: Create GitHub deployment for Frontend
-      uses: chrnorm/deployment-action@v2
+      uses: chrnorm/deployment-action@55729fcebec3d284f60f5bcabbd8376437d696b1 # v2
       id: deployment_frontend
       with:
         token: ${{ secrets.BOT_TOKEN || secrets.GITHUB_TOKEN }}
@@ -97,7 +97,7 @@ jobs:
         yarn build
     
     - name: Setup AWS
-      uses: aws-actions/configure-aws-credentials@v4
+      uses: aws-actions/configure-aws-credentials@61815dcd50bd041e203e49132bacad1fd04d2708 # v5
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -109,7 +109,7 @@ jobs:
       run: aws s3 sync ./build/ s3://$AWS_S3_BUCKET/ --delete
 
     - name: Invalidate CloudFront cache
-      uses: chetan/invalidate-cloudfront-action@v2
+      uses: chetan/invalidate-cloudfront-action@c384d5f09592318a77b1e5c0c8d4772317e48b25 # v2
       env:
         DISTRIBUTION: E30XKAM2TG9FD8
         PATHS: '/*'
@@ -119,7 +119,7 @@ jobs:
         
     - name: Update GitHub deployment status (Frontend)
       if: always()
-      uses: chrnorm/deployment-status@v2
+      uses: chrnorm/deployment-status@9a72af4586197112e0491ea843682b5dc280d806 # v2
       with:
         token: ${{ secrets.BOT_TOKEN || secrets.GITHUB_TOKEN }}
         state: "${{ job.status }}"
