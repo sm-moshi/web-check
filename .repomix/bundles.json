@@ -39,7 +39,10 @@
         "mise.toml",
         ".yarnrc.yml",
         ".astro",
-        "renovate.json"
+        "renovate.json",
+        "eslint.config.ts",
+        ".dockerignore",
+        "scripts"
       ]
     }
   }
