@@ -13,8 +13,8 @@ const durationVariance = 1; // Variance for randomization to append to travel in
 const delayBase = 500; // Base delay for meteor to respawn in milliseconds
 const delayVariance = 1500; // Variance for randomization to append to respawn in milliseconds
 const tailDuration = 0.25; // Duration for meteor tail to retract in seconds
-const headEasing = [0.8, 0.6, 1, 1]; // Easing for meteor head
-const tailEasing = [0.5, 0.6, 0.6, 1]; // Easing for meteor tail
+const headEasing: [number, number, number, number] = [0.8, 0.6, 1, 1]; // Easing for meteor head
+const tailEasing: [number, number, number, number] = [0.5, 0.6, 0.6, 1]; // Easing for meteor tail
 
 const MeteorContainer = styled(motion.div)`
   position: absolute;

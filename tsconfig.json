@@ -23,6 +23,7 @@
     "noEmit": true,
     "jsx": "react-jsx",
     "jsxImportSource": "react",
+    "types": ["astro/client", "vite/client", "react", "react-dom"],
     "baseUrl": "src",
     "paths": {
       "@/*": ["*"],
