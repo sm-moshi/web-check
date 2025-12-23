@@ -25,6 +25,7 @@ ENV PUPPETEER_SKIP_DOWNLOAD=1 \
 
 # deps first (cache)
 COPY package.json yarn.lock .yarnrc.yml ./
+COPY scripts ./scripts
 RUN yarn install --frozen-lockfile
 
 # build
@@ -49,7 +50,7 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends \
     dumb-init ca-certificates \
     chromium fonts-liberation fontconfig \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* /usr/share/doc /usr/share/man /usr/share/locale
 
 # Yarn via Corepack
 RUN corepack enable
@@ -59,8 +60,9 @@ RUN useradd --create-home --uid 10001 --shell /usr/sbin/nologin webcheck
 
 # install ONLY production deps (no dev deps)
 COPY package.json yarn.lock .yarnrc.yml ./
-RUN yarn install --frozen-lockfile --production=true \
-    && yarn cache clean --all || true
+RUN YARN_IGNORE_SCRIPTS=1 yarn install --frozen-lockfile --production=true \
+    && yarn cache clean --all || true \
+    && rm -rf node_modules/esbuild node_modules/@esbuild
 
 # copy only runtime artifacts
 COPY --from=build /app/dist ./dist

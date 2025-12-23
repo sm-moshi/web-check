@@ -1,10 +1,11 @@
 import axios from 'axios';
-import puppeteer from 'puppeteer';
+import puppeteer from 'puppeteer-core';
 import middleware from './_common/middleware.js';
 
 const getPuppeteerCookies = async (url) => {
   const browser = await puppeteer.launch({
     headless: 'new',
+    executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || process.env.CHROME_PATH || '/usr/bin/chromium',
     args: ['--no-sandbox', '--disable-setuid-sandbox'],
   });
 

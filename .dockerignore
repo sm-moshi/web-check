@@ -1,0 +1,13 @@
+/.git
+/.astro
+/.repomix
+/.vscode
+/.yarn
+/chrome
+/dist
+/node_modules
+/artifacts
+/logs
+.env
+.env.*
+*.log
