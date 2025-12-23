@@ -1,5 +1,6 @@
 import net from 'net';
 import middleware from './_common/middleware.js';
+import { resolvePublicHost } from './_common/host-guard.js';
 
 // A list of commonly used ports.
 const DEFAULT_PORTS_TO_CHECK = [
@@ -40,7 +41,13 @@ async function checkPort(port, domain) {
 }
 
 const portsHandler = async (url, event, context) => {
-  const domain = url.replace(/(^\w+:|^)\/\//, '');
+  let host;
+  try {
+    host = new URL(url).hostname;
+  } catch (error) {
+    throw new Error('Invalid URL provided');
+  }
+  const { address } = await resolvePublicHost(host);
   
   const delay = ms => new Promise(res => setTimeout(res, ms));
   const timeout = delay(9000);
@@ -48,7 +55,7 @@ const portsHandler = async (url, event, context) => {
   const openPorts = [];
   const failedPorts = [];
 
-  const promises = PORTS.map(port => checkPort(port, domain)
+  const promises = PORTS.map(port => checkPort(port, address)
     .then(() => {
       openPorts.push(port);
       return { status: 'fulfilled', port };

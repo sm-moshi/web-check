@@ -1,5 +1,5 @@
 import puppeteer from 'puppeteer-core';
-import chromium from 'chrome-aws-lambda';
+import chromium from '@sparticuz/chromium';
 import middleware from './_common/middleware.js';
 import { execFile } from 'child_process';
 import { promises as fs } from 'fs';
@@ -8,7 +8,7 @@ import pkg from 'uuid';
 const { v4: uuidv4 } = pkg;
 
 // Helper function for direct chromium screenshot as fallback
-const directChromiumScreenshot = async (url) => {
+const directChromiumScreenshot = async (url, chromePath) => {
   console.log(`[DIRECT-SCREENSHOT] Starting direct screenshot process for URL: ${url}`);
   
   // Create a tmp filename
@@ -19,7 +19,6 @@ const directChromiumScreenshot = async (url) => {
   console.log(`[DIRECT-SCREENSHOT] Will save screenshot to: ${screenshotPath}`);
   
   return new Promise((resolve, reject) => {
-    const chromePath = process.env.CHROME_PATH || '/usr/bin/chromium';
     const args = [
       '--headless',
       '--disable-gpu',
@@ -57,6 +56,17 @@ const directChromiumScreenshot = async (url) => {
   });
 };
 
+const resolveChromePath = async () => {
+  if (process.env.CHROME_PATH) {
+    return process.env.CHROME_PATH;
+  }
+  const executablePath = await chromium.executablePath();
+  if (!executablePath) {
+    throw new Error('Chromium executable path not found');
+  }
+  return executablePath;
+};
+
 const screenshotHandler = async (targetUrl) => {
   console.log(`[SCREENSHOT] Request received for URL: ${targetUrl}`);
   
@@ -76,10 +86,12 @@ const screenshotHandler = async (targetUrl) => {
     throw new Error('URL provided is invalid');
   }
 
+  const chromePath = await resolveChromePath();
+
   // First try direct Chromium
   try {
     console.log(`[SCREENSHOT] Using direct Chromium method for URL: ${targetUrl}`);
-    const base64Screenshot = await directChromiumScreenshot(targetUrl);
+    const base64Screenshot = await directChromiumScreenshot(targetUrl, chromePath);
     console.log(`[SCREENSHOT] Direct screenshot successful`);
     return { image: base64Screenshot };
   } catch (directError) {
@@ -94,7 +106,7 @@ const screenshotHandler = async (targetUrl) => {
     browser = await puppeteer.launch({
       args: [...chromium.args, '--no-sandbox'], // Add --no-sandbox flag
       defaultViewport: { width: 800, height: 600 },
-      executablePath: process.env.CHROME_PATH || '/usr/bin/chromium',
+      executablePath: chromePath,
       headless: true,
       ignoreHTTPSErrors: true,
       ignoreDefaultArgs: ['--disable-extensions'],

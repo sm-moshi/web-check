@@ -49,6 +49,7 @@ ENV NODE_ENV=production \
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
     dumb-init ca-certificates \
+    traceroute \
     chromium fonts-liberation fontconfig \
     && rm -rf /var/lib/apt/lists/* /usr/share/doc /usr/share/man /usr/share/locale
 
