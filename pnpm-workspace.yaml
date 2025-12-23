@@ -1,0 +1,7 @@
+onlyBuiltDependencies:
+  - '@parcel/watcher'
+  - chromium
+  - esbuild
+  - puppeteer
+  - sharp
+  - workerd

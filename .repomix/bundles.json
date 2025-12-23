@@ -1,0 +1,42 @@
+{
+  "bundles": {
+    "web-check-775": {
+      "name": "web-check",
+      "configPath": ".repomix/config/web-check-repomix.config.json",
+      "created": "2025-12-23T06:52:30.122Z",
+      "lastUsed": "2025-12-23T07:08:28.733Z",
+      "tags": [],
+      "files": [
+        "api",
+        "public/resources",
+        "public/error.html",
+        "public/index.html",
+        "public/manifest.json",
+        "public/placeholder.html",
+        "public/robots.txt",
+        "public/security.txt",
+        ".github/workflows/docker.yml",
+        ".env",
+        ".gitignore",
+        "astro.config.mjs",
+        "docker-compose.yml",
+        "Dockerfile",
+        "fly.toml",
+        "netlify.toml",
+        "package.json",
+        "server.js",
+        "svelte.config.js",
+        "tsconfig.json",
+        "vercel.json",
+        "vite.config.js",
+        "yarn.lock",
+        "src/components",
+        "src/layouts",
+        "src/pages",
+        "src/styles",
+        "src/web-check-live",
+        "src/env.d.ts"
+      ]
+    }
+  }
+}
