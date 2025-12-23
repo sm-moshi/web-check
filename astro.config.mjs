@@ -23,6 +23,8 @@ const unwrapEnvVar = (varName, fallbackValue) => {
 const deployTarget = unwrapEnvVar('PLATFORM', 'node').toLowerCase();
 
 // Determine the output mode (server or static)
+// In Astro 5, 'static' is the default and supports optional SSR via `export const prerender = false`
+// Use 'server' only if most pages need server-rendering. This project is mostly static with one dynamic page.
 const output = unwrapEnvVar('OUTPUT', 'static');
 
 // The FQDN of where the site is hosted (used for sitemaps & canonical URLs)
@@ -75,4 +77,20 @@ if (!isBossServer && isBossServer !== true) {
 }
 
 // Export Astro configuration
-export default defineConfig({ output, base, integrations, site, adapter, redirects });
+export default defineConfig({ 
+  output, 
+  base, 
+  integrations, 
+  site, 
+  adapter, 
+  redirects,
+  vite: {
+    resolve: {
+      conditions: ['svelte', 'import', 'browser', 'default'],
+    },
+    ssr: {
+      noExternal: ['@fortawesome/svelte-fontawesome'],
+    },
+  },
+});
+

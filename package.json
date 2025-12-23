@@ -4,6 +4,7 @@
   "version": "2.0.2-r5",
   "homepage": "https://web-check.xyz",
   "scripts": {
+    "postinstall": "node scripts/postinstall.cjs",
     "start": "node server",
     "start-pm": "pm2 start server.js -i max",
     "build": "astro check && astro build",
