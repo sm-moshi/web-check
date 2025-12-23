@@ -1,6 +1,6 @@
 import React from 'react';
 import type { ReactNode } from 'react';
-import ReactDOM from 'react-dom';
+import { createPortal } from 'react-dom';
 import styled from '@emotion/styled';
 import colors from 'web-check-live/styles/colors';
 import Button from 'web-check-live/components/Form/Button';
@@ -78,7 +78,7 @@ const Modal: React.FC<ModalProps> = ({ children, isOpen, closeModal }) => {
     return null;
   }
 
-  return ReactDOM.createPortal(
+  return createPortal(
     <Overlay onClick={handleOverlayClick}>
       <ModalWindow>
         {children}
