@@ -36,7 +36,7 @@
     "express-rate-limit": "^7.5.1",
     "framer-motion": "^11.18.2",
     "got": "^14.6.5",
-    "pm2": "^5.4.3",
+    "pm2": "^6.0.9",
     "psl": "^1.15.0",
     "puppeteer": "^22.15.0",
     "puppeteer-core": "^22.15.0",
