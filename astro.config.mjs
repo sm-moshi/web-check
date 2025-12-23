@@ -85,7 +85,7 @@ export default defineConfig({
   redirects,
   vite: {
     resolve: {
-      conditions: ['svelte', 'import', 'module', 'browser', 'default'],
+      conditions: ['svelte', 'import', 'browser', 'default'],
     },
     ssr: {
       noExternal: ['@fortawesome/svelte-fontawesome'],

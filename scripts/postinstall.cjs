@@ -18,6 +18,11 @@ if (!fs.existsSync(packageJsonPath)) {
 try {
   const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
 
+  // Ensure exports field exists
+  if (!packageJson.exports) {
+    packageJson.exports = {};
+  }
+
   // Check if the package already has the fix
   if (packageJson.exports["."] && packageJson.exports["."].import) {
     console.log('✓ @fortawesome/svelte-fontawesome already patched');
