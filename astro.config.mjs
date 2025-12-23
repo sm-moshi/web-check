@@ -23,8 +23,9 @@ const unwrapEnvVar = (varName, fallbackValue) => {
 const deployTarget = unwrapEnvVar('PLATFORM', 'node').toLowerCase();
 
 // Determine the output mode (server or static)
-// Note: 'hybrid' was removed in Astro 5. Use 'server' for SSR with optional prerendering.
-const output = unwrapEnvVar('OUTPUT', 'server');
+// In Astro 5, 'static' is the default and supports optional SSR via `export const prerender = false`
+// Use 'server' only if most pages need server-rendering. This project is mostly static with one dynamic page.
+const output = unwrapEnvVar('OUTPUT', 'static');
 
 // The FQDN of where the site is hosted (used for sitemaps & canonical URLs)
 const site = unwrapEnvVar('SITE_URL', 'https://check.m0sh1.cc');
