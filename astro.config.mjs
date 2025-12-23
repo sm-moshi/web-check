@@ -22,8 +22,8 @@ const unwrapEnvVar = (varName, fallbackValue) => {
 // Determine the deploy target (vercel, netlify, cloudflare, node)
 const deployTarget = unwrapEnvVar('PLATFORM', 'node').toLowerCase();
 
-// Determine the output mode (server, hybrid or static)
-const output = unwrapEnvVar('OUTPUT', 'hybrid');
+// Determine the output mode (server or static)
+const output = unwrapEnvVar('OUTPUT', 'static');
 
 // The FQDN of where the site is hosted (used for sitemaps & canonical URLs)
 const site = unwrapEnvVar('SITE_URL', 'https://check.m0sh1.cc');
@@ -76,4 +76,3 @@ if (!isBossServer && isBossServer !== true) {
 
 // Export Astro configuration
 export default defineConfig({ output, base, integrations, site, adapter, redirects });
-

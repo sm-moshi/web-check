@@ -1,0 +1,44 @@
+name: "Copilot Setup Steps"
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - .github/workflows/copilot-setup-steps.yml
+  pull_request:
+    paths:
+      - .github/workflows/copilot-setup-steps.yml
+
+jobs:
+  # The job MUST be called `copilot-setup-steps` for Copilot coding agent to pick it up
+  copilot-setup-steps:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    env:
+      ASTRO_TELEMETRY_DISABLED: "1"
+      PUPPETEER_SKIP_DOWNLOAD: "1"
+      PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: "1"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "yarn"
+
+      - name: Install Chromium
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y chromium-browser || sudo apt-get install -y chromium
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Install dependencies (skip browser downloads)
+        run: yarn install --frozen-lockfile
