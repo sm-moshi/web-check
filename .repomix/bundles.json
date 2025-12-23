@@ -38,7 +38,8 @@
         "src/env.d.ts",
         "mise.toml",
         ".yarnrc.yml",
-        ".astro"
+        ".astro",
+        "renovate.json"
       ]
     }
   }
