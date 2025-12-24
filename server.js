@@ -13,6 +13,14 @@ dotenv.config();
 // Create the Express app
 const app = express();
 
+// Rate limiter for fallback error page to mitigate DoS via repeated 404s
+const errorPageLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 200, // limit each IP to 200 error page requests per window
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 const __filename = new URL(import.meta.url).pathname;
 const __dirname = path.dirname(__filename);
 
@@ -180,7 +188,7 @@ app.use(historyApiFallback({
 }));
 
 // Anything left unhandled (which isn't an API endpoint), return a 404
-app.use((req, res, next) => {
+app.use(errorPageLimiter, (req, res, next) => {
   if (!req.path.startsWith(`${API_DIR}/`)) {
     res.status(404).sendFile(path.join(__dirname, 'public', 'error.html'));
   } else {
