@@ -6,7 +6,7 @@ import colors from 'web-check-live/styles/colors';
 
 const cardStyles = ``;
 
-const MailConfigCard = (props: {data: any, title: string, actionButtons: any }): JSX.Element => {
+const MailConfigCard = (props: { data: any, title: string, actionButtons: any }): JSX.Element => {
   const mailServer = props.data;
   const txtRecords = (mailServer.txtRecords || []).join('').toLowerCase() || '';
   return (
@@ -17,26 +17,26 @@ const MailConfigCard = (props: {data: any, title: string, actionButtons: any }):
       <Row lbl="DMARC" val={txtRecords.includes('dmarc')} />
       <Row lbl="BIMI" val={txtRecords.includes('bimi')} />
 
-      { mailServer.mxRecords && <Heading as="h3" color={colors.primary} size="small">MX Records</Heading>}
-      { mailServer.mxRecords && mailServer.mxRecords.map((record: any, index: number) => (
-          <Row lbl="" val="" key={index}>
-            <span>{record.exchange}</span>
-            <span>{record.priority ? `Priority: ${record.priority}` : ''}</span>
-          </Row>
-        ))
+      {mailServer.mxRecords && <Heading as="h3" color={colors.primary} size="small">MX Records</Heading>}
+      {mailServer.mxRecords && mailServer.mxRecords.map((record: any, index: number) => (
+        <Row lbl="" val="" key={index}>
+          <span>{record.exchange}</span>
+          <span>{record.priority ? `Priority: ${record.priority}` : ''}</span>
+        </Row>
+      ))
       }
-      { mailServer.mailServices.length > 0 && <Heading as="h3" color={colors.primary} size="small">External Mail Services</Heading>}
-      { mailServer.mailServices && mailServer.mailServices.map((service: any, index: number) => (
+      {mailServer.mailServices.length > 0 && <Heading as="h3" color={colors.primary} size="small">External Mail Services</Heading>}
+      {mailServer.mailServices && mailServer.mailServices.map((service: any, index: number) => (
         <Row lbl={service.provider} title={service.value} val="" key={index} />
-        ))
+      ))
       }
 
-      { mailServer.txtRecords && <Heading as="h3" color={colors.primary} size="small">Mail-related TXT Records</Heading>}
-      { mailServer.txtRecords && mailServer.txtRecords.map((record: any, index: number) => (
-          <Row lbl="" val="" key={index}>
-            <span>{record}</span>
-          </Row>
-        ))
+      {mailServer.txtRecords && <Heading as="h3" color={colors.primary} size="small">Mail-related TXT Records</Heading>}
+      {mailServer.txtRecords && mailServer.txtRecords.map((record: any, index: number) => (
+        <Row lbl="" val="" key={index}>
+          <span>{record}</span>
+        </Row>
+      ))
       }
     </Card>
   );

@@ -1,4 +1,4 @@
-import React, { Component, type ErrorInfo, type ReactNode } from "react";
+import { Component, type ErrorInfo, type ReactNode } from "react";
 import styled from '@emotion/styled';
 import Card from 'web-check-live/components/Form/Card';
 import Heading from 'web-check-live/components/Form/Heading';
@@ -39,7 +39,7 @@ class ErrorBoundary extends Component<Props, State> {
     if (this.state.hasError) {
       return (
         <Card>
-          { this.props.title && <Heading color={colors.primary}>{this.props.title}</Heading> }
+          {this.props.title && <Heading color={colors.primary}>{this.props.title}</Heading>}
           <ErrorText>This component errored unexpectedly</ErrorText>
           <p>
             Usually this happens if the result from the server was not what was expected.

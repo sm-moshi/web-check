@@ -14,12 +14,13 @@
   "env": {
     "PLATFORM": "vercel",
     "CI": "false",
-    "CHROME_PATH": "/usr/bin/chromium",
-    "NODE_VERSION": "22.x",
+    "CHROME_PATH": "/opt/homebrew/bin/chromium",
+    "NODE_VERSION": "24.x",
     "GOOGLE_CLOUD_API_KEY": "",
     "BUILT_WITH_API_KEY": "",
     "REACT_APP_SHODAN_API_KEY": "",
-    "REACT_APP_WHO_API_KEY": ""
+    "REACT_APP_WHO_API_KEY": "",
+    "URL_SCAN_API_KEY": ""
   },
   "build": {
     "env": {

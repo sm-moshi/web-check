@@ -1,5 +1,6 @@
 import https from 'https';
 import middleware from './_common/middleware.js';
+import { fetchWappalyzergo } from './_common/wappalyzergo.js';
 
 const featuresHandler = async (url) => {
   const apiKey = process.env.BUILT_WITH_API_KEY;
@@ -8,8 +9,29 @@ const featuresHandler = async (url) => {
     throw new Error('URL query parameter is required');
   }
 
+  const buildWappalyzerFallback = async (reason) => {
+    const fallback = await fetchWappalyzergo(url);
+    if (!fallback) {
+      return { skipped: reason };
+    }
+    const technologies = Array.isArray(fallback.technologies) ? fallback.technologies : [];
+    return {
+      provider: fallback.provider || 'wappalyzergo',
+      last: Math.floor(Date.now() / 1000),
+      groups: [
+        {
+          name: 'Detected technologies',
+          categories: technologies.map((tech) => ({
+            name: tech.name,
+            live: 'Detected',
+          })),
+        },
+      ],
+    };
+  };
+
   if (!apiKey) {
-    throw new Error('Missing BuiltWith API key in environment variables');
+    return buildWappalyzerFallback('BuiltWith API key not configured (BUILT_WITH_API_KEY).');
   }
 
   const apiUrl = `https://api.builtwith.com/free1/api.json?KEY=${apiKey}&LOOKUP=${encodeURIComponent(url)}`;
@@ -41,7 +63,14 @@ const featuresHandler = async (url) => {
 
     return response;
   } catch (error) {
-    throw new Error(`Error making request: ${error.message}`);
+    const message = error?.message || 'Unknown error';
+    if (message.includes('status code: 429')) {
+      return buildWappalyzerFallback('BuiltWith rate limit exceeded (HTTP 429). Try again later.');
+    }
+    if (message.includes('status code: 401') || message.includes('status code: 402') || message.includes('status code: 403')) {
+      return buildWappalyzerFallback('BuiltWith API plan does not permit this lookup.');
+    }
+    throw new Error(`Error making request: ${message}`);
   }
 };
 

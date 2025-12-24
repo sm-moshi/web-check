@@ -25,7 +25,7 @@ h4 {
 const DocContent = (id: string) => {
   const doc = docs.filter((doc: Doc) => doc.id === id)[0] || null;
   return (
-    doc? (<JobDocsContainer>
+    doc ? (<JobDocsContainer>
       <Heading as="h3" size="medium" color={colors.primary}>{doc.title}</Heading>
       <Heading as="h4" size="small">About</Heading>
       <p className="doc-desc">{doc.description}</p>
@@ -33,7 +33,7 @@ const DocContent = (id: string) => {
       <p className="doc-uses">{doc.use}</p>
       <Heading as="h4" size="small">Links</Heading>
       <ul>
-        {doc.resources.map((resource: string | { title: string, link: string } , index: number) => (
+        {doc.resources.map((resource: string | { title: string, link: string }, index: number) => (
           typeof resource === 'string' ? (
             <li id={`link-${index}`}><a target="_blank" rel="noreferrer" href={resource}>{resource}</a></li>
           ) : (
@@ -46,11 +46,11 @@ const DocContent = (id: string) => {
         <img width="300" src={doc.screenshot} alt="Screenshot" />
       </details>
     </JobDocsContainer>)
-  : (
-    <JobDocsContainer>
-      <p>No Docs provided for this widget yet</p>
-    </JobDocsContainer>
-    ));
+      : (
+        <JobDocsContainer>
+          <p>No Docs provided for this widget yet</p>
+        </JobDocsContainer>
+      ));
 };
 
 export default DocContent;

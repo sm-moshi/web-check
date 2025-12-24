@@ -19,7 +19,7 @@ const makeValue = (audit: Audit) => {
   if (audit.displayValue) {
     score = audit.displayValue;
   } else if (audit.scoreDisplayMode) {
-    score = audit.score === 1 ? '✅ Pass' : '❌ Fail'; 
+    score = audit.score === 1 ? '✅ Pass' : '❌ Fail';
   }
   return score;
 };
@@ -31,7 +31,7 @@ const LighthouseCard = (props: { data: any, title: string, actionButtons: any })
 
   return (
     <Card heading={props.title} actionButtons={props.actionButtons}>
-      { Object.keys(categories).map((title: string, index: number) => {
+      {Object.keys(categories).map((title: string, index: number) => {
         const scoreIds = categories[title].auditRefs.map((ref: { id: string }) => ref.id);
         const scoreList = scoreIds.map((id: string) => {
           return { lbl: audits[id].title, val: makeValue(audits[id]), title: audits[id].description, key: id }
@@ -44,7 +44,7 @@ const LighthouseCard = (props: { data: any, title: string, actionButtons: any })
             rowList={scoreList}
           />
         );
-      }) }
+      })}
     </Card>
   );
 }

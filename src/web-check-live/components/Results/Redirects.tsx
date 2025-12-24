@@ -23,7 +23,7 @@ const RedirectsCard = (props: { data: any, title: string, actionButtons: any }):
   const redirects = props.data;
   return (
     <Card heading={props.title} actionButtons={props.actionButtons} styles={cardStyles}>
-      { !redirects?.redirects.length && <Row lbl="" val="No redirects" />}
+      {!redirects?.redirects.length && <Row lbl="" val="No redirects" />}
       <p className="redirect-count">
         Followed {redirects.redirects.length}{' '}
         redirect{redirects.redirects.length === 1 ? '' : 's'} when contacting host
@@ -31,7 +31,7 @@ const RedirectsCard = (props: { data: any, title: string, actionButtons: any }):
       {redirects.redirects.map((redirect: any, index: number) => {
         return (
           <Row lbl="" val="" key={index}>
-          <span className="arrow-thing">↳</span> {redirect}
+            <span className="arrow-thing">↳</span> {redirect}
           </Row>
         );
       })}

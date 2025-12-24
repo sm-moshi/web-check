@@ -25,6 +25,27 @@ interface UseIpAddressProps<ResultType = any> {
 
 type ResultType = any;
 
+type FetchErrorResult = {
+  error?: string;
+  errorType?: string;
+  errorMessage?: string;
+  skipped?: string;
+};
+
+type FetchResponse<Result> = Result | FetchErrorResult;
+
+const isFetchErrorResult = (value: unknown): value is FetchErrorResult => {
+  if (!value || typeof value !== 'object') {
+    return false;
+  }
+  return (
+    'error' in value
+    || 'errorType' in value
+    || 'errorMessage' in value
+    || 'skipped' in value
+  );
+};
+
 type ReturnType = [ResultType | undefined, (data?: any) => void];
 
 const useMotherOfAllHooks = <ResultType = any>(params: UseIpAddressProps<ResultType>): ReturnType => {
@@ -37,37 +58,38 @@ const useMotherOfAllHooks = <ResultType = any>(params: UseIpAddressProps<ResultT
 
   // Fire off the HTTP fetch request, then set results and update loading / error state
 
-  const doTheFetch = () => {
+  const doTheFetch = async () => {
     if (keys.disableEverything) {
       updateLoadingJobs(jobId, 'skipped', 'Web-Check is temporarily disabled. Please try again later.', reset);
-      return Promise.resolve();
+      return;
     }
-    return fetchRequest()
-    .then((res: any) => {
+    try {
+      const res = await fetchRequest();
+      const response = res as FetchResponse<ResultType>;
+      const errorResult = isFetchErrorResult(response) ? response : null;
       if (!res) { // No response :(
         updateLoadingJobs(jobId, 'error', 'No response', reset);
-      } else if (res.error) { // Response returned an error message
-        if (res.error.includes("timed-out")) { // Specific handling for timeout errors
-          updateLoadingJobs(jobId, 'timed-out', res.error, reset);
+      } else if (errorResult && errorResult.error) { // Response returned an error message
+        if (errorResult.error.includes("timed-out")) { // Specific handling for timeout errors
+          updateLoadingJobs(jobId, 'timed-out', errorResult.error, reset);
         } else {
-          updateLoadingJobs(jobId, 'error', res.error, reset);
+          updateLoadingJobs(jobId, 'error', errorResult.error, reset);
         }
-      } else if (res.errorType && res.errorMessage) {
-        const errorMessage = `${res.errorType}\n${res.errorMessage}\n\n`
+      } else if (errorResult && errorResult.errorType && errorResult.errorMessage) {
+        const errorMessage = `${errorResult.errorType}\n${errorResult.errorMessage}\n\n`
         + `This sometimes occurs on Netlify if using the free plan. You may need to upgrade to use lambda functions`;
         updateLoadingJobs(jobId, 'error', errorMessage, reset);
-      } else if (res.skipped) { // Response returned a skipped message
-        updateLoadingJobs(jobId, 'skipped', res.skipped, reset);
+      } else if (errorResult && errorResult.skipped) { // Response returned a skipped message
+        updateLoadingJobs(jobId, 'skipped', errorResult.skipped, reset);
       } else { // Yay, everything went to plan :)
         setResult(res);
         updateLoadingJobs(jobId, 'success', '', undefined, res);
       }
-    })
-    .catch((err) => {
+    } catch (err: any) {
       // Something fucked up
-      updateLoadingJobs(jobId, 'error', err.error || err.message || 'Unknown error', reset);
+      updateLoadingJobs(jobId, 'error', err?.error || err?.message || 'Unknown error', reset);
       throw err;
-    })
+    }
   }
 
   // For when the user manually re-triggers the job
@@ -102,8 +124,6 @@ const useMotherOfAllHooks = <ResultType = any>(params: UseIpAddressProps<ResultT
 
     // Initiate the data fetching process
     doTheFetch().catch(() => {});
-    
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [address, addressType]);
 
   return [result, reset];

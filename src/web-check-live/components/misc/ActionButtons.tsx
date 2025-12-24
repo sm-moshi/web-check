@@ -13,9 +13,9 @@ const ActionButtonContainer = styled.div`
 `;
 
 interface Action {
-    label: string;
-    icon: string;
-    onClick: () => void;
+  label: string;
+  icon: string;
+  onClick: () => void;
 };
 
 const actionButtonStyles = `
@@ -43,13 +43,13 @@ const ActionButtons = (props: { actions: any }): JSX.Element => {
   if (!actions) return (<></>);
   return (
     <ActionButtonContainer>
-      { actions.map((action: Action, index: number) => 
+      {actions.map((action: Action, index: number) =>
         <Button
           key={`action-${index}`}
           styles={actionButtonStyles}
           onClick={action.onClick}
           title={action.label}>
-            {action.icon}
+          {action.icon}
         </Button>
       )}
     </ActionButtonContainer>

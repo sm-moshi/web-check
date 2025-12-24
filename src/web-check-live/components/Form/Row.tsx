@@ -31,7 +31,7 @@ export const StyledRow = styled.div`
     a {
       color: ${colors.primary};
     }
-  }  
+  }
 `;
 
 export const Details = styled.details`
@@ -145,18 +145,18 @@ export const ExpandableRow = (props: RowProps) => {
         <span className="lbl" title={title?.toString()}>{lbl}</span>
         <span className="val" title={val?.toString()}>{val.toString()}</span>
       </StyledRow>
-      { rowList &&
+      {rowList &&
         <SubRowList>
-          { rowList?.map((row: RowProps, index: number) => {
+          {rowList?.map((row: RowProps, index: number) => {
             return (
               <StyledRow as="li" key={`${row.lbl}-${index}`}>
                 <span className="lbl" title={row.title?.toString()}>{row.lbl}</span>
                 <span className="val" title={row.val?.toString()} onClick={() => copyToClipboard(row.val)}>
                   {formatValue(row.val)}
                 </span>
-                { row.plaintext && <PlainText>{row.plaintext}</PlainText> }
-                { row.listResults && (<List>
-                  {row.listResults.map((listItem: string, listIndex: number) => (
+                {row.plaintext && <PlainText>{row.plaintext}</PlainText>}
+                {row.listResults && (<List>
+                  {row.listResults.map((listItem: string) => (
                     <li key={listItem}>{snip(listItem)}</li>
                   ))}
                 </List>)}
@@ -172,35 +172,37 @@ export const ExpandableRow = (props: RowProps) => {
 export const ListRow = (props: { list: string[], title: string }) => {
   const { list, title } = props;
   return (
-  <>
-    <Heading as="h4" size="small" align="left" color={colors.primary}>{title}</Heading>
-    { list.map((entry: string, index: number) => {
-      return (
-      <Row lbl="" val="" key={`${entry}-${title.toLocaleLowerCase()}-${index}`}>
-        <span>{ entry }</span>
-      </Row>
+    <>
+      <Heading as="h4" size="small" align="left" color={colors.primary}>{title}</Heading>
+      {list.map((entry: string, index: number) => {
+        return (
+          <Row lbl="" val="" key={`${entry}-${title.toLocaleLowerCase()}-${index}`}>
+            <span>{entry}</span>
+          </Row>
+        )
+      }
       )}
-    )}
-  </>
-);
+    </>
+  );
 }
 
 const Row = (props: RowProps) => {
   const { lbl, val, title, plaintext, listResults, children } = props;
+  const valueTitle = val !== undefined && val !== null ? val.toString() : '';
   if (children) return <StyledRow key={`${lbl}-${val}`}>{children}</StyledRow>;
   return (
-  <StyledRow key={`${lbl}-${val}`}>
-    { lbl && <span className="lbl" title={title?.toString()}>{lbl}</span> }
-    <span className="val" title={val} onClick={() => copyToClipboard(val)}>
-      {formatValue(val)}
-    </span>
-    { plaintext && <PlainText>{plaintext}</PlainText> }
-    { listResults && (<List>
-      {listResults.map((listItem: string, listIndex: number) => (
-        <li key={listIndex} title={listItem}>{snip(listItem)}</li>
-      ))}
-    </List>)}
-  </StyledRow>
+    <StyledRow key={`${lbl}-${val}`}>
+      {lbl && <span className="lbl" title={title?.toString()}>{lbl}</span>}
+      <span className="val" title={valueTitle} onClick={() => copyToClipboard(val)}>
+        {formatValue(val)}
+      </span>
+      {plaintext && <PlainText>{plaintext}</PlainText>}
+      {listResults && (<List>
+        {listResults.map((listItem: string, listIndex: number) => (
+          <li key={listIndex} title={listItem}>{snip(listItem)}</li>
+        ))}
+      </List>)}
+    </StyledRow>
   );
 };
 

@@ -135,7 +135,7 @@ const WebCheckHomeBackground = () => {
         <StyledRect fill="url(#dot-pattern)" />
       </StyledSvg>
 
-      {meteors.map(({ id, column, startRow, endRow, duration, tailVisible, animationStage, opacity }) => {
+      {meteors.map(({ id, column, startRow, endRow, duration, tailVisible, animationStage }) => {
         return (
         <MeteorContainer
           key={id}

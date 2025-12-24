@@ -25,7 +25,7 @@ const makeExpandableData = (results: any) => {
       if (typeof val !== 'object') {
         return { lbl, val };
       }
-      return { lbl, val: '', plaintext: JSON.stringify(analysis.result[label])};
+      return { lbl, val: '', plaintext: JSON.stringify(analysis.result[label]) };
     });
     return {
       title: analysis.analyzer,
@@ -68,7 +68,7 @@ const makeResults = (results: any) => {
   return rows;
 };
 
-const TlsCard = (props: {data: any, title: string, actionButtons: any }): JSX.Element => {
+const TlsCard = (props: { data: any, title: string, actionButtons: any }): JSX.Element => {
 
   const [tlsRowData, setTlsRowWata] = useState(makeExpandableData(props.data));
   const [tlsResults, setTlsResults] = useState(makeResults(props.data));
@@ -89,15 +89,15 @@ const TlsCard = (props: {data: any, title: string, actionButtons: any }): JSX.El
         setTlsRowWata(makeExpandableData(data));
         setTlsResults(makeResults(data));
         setLoadState('success');
-    }).catch(() => {
-      setLoadState('error');
-    });
+      }).catch(() => {
+        setLoadState('error');
+      });
   };
-  
+
   const scanId = props.data?.id;
   return (
     <Card heading={props.title} actionButtons={props.actionButtons}>
-      { tlsResults.length > 0 && tlsResults.map((row: any, index: number) => {
+      {tlsResults.length > 0 && tlsResults.map((row: any, index: number) => {
         return (
           <Row
             lbl={row.lbl}
@@ -110,13 +110,18 @@ const TlsCard = (props: {data: any, title: string, actionButtons: any }): JSX.El
       })}
       <Expandable>
         <summary>Full Analysis Results</summary>
-        { tlsRowData.length > 0 && tlsRowData.map((cipherSuite: any, index: number) => {
+        {tlsRowData.length > 0 && tlsRowData.map((cipherSuite: any, index: number) => {
           return (
-            <ExpandableRow lbl={cipherSuite.title} val={cipherSuite.value || '?'} rowList={cipherSuite.fields} />
+            <ExpandableRow
+              key={`tls-issue-${index}`}
+              lbl={cipherSuite.title}
+              val={cipherSuite.value || '?'}
+              rowList={cipherSuite.fields}
+            />
           );
         })}
       </Expandable>
-      { !tlsRowData.length && (
+      {!tlsRowData.length && (
         <div>
           <p>No entries available to analyze.<br />
             This sometimes happens when the report didn't finish generating in-time, you can try re-requesting it.

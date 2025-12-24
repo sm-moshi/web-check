@@ -78,33 +78,47 @@ h4 {
 }
 `;
 
-const TechStackCard = (props: {data: any, title: string, actionButtons: any }): JSX.Element => {
-  const technologies = props.data.technologies;
-  const iconsCdn = 'https://www.wappalyzer.com/images/icons/';
+const TechStackCard = (props: { data: any, title: string, actionButtons: any }): JSX.Element => {
+  const technologies = props.data?.technologies || [];
   return (
     <Card heading={props.title} actionButtons={props.actionButtons} styles={cardStyles}>
+      {technologies.length === 0 && (
+        <p>No technologies detected.</p>
+      )}
       {technologies.map((tech: any, index: number) => {
+        const categories = Array.isArray(tech.categories) ? tech.categories : [];
+        const website = tech.website || '';
+        const iconSrc = typeof tech.icon === 'string'
+          && (tech.icon.startsWith('http') || tech.icon.startsWith('data:'))
+          ? tech.icon
+          : '';
         return (
-        <TechStackRow key={`tech-stack-row-${index}`}>
-          <div className="r1">
-            <Heading as="h4" size="small">
-              {tech.name}
-              <span className="tech-version">{tech.version? `(v${tech.version})` : ''}</span>
-            </Heading>  
-            <span className="tech-confidence" title={`${tech.confidence}% certain`}>Certainty: {tech.confidence}%</span>
-            <span className="tech-categories">
-              {tech.categories.map((cat: any, i: number) => `${cat.name}${i < tech.categories.length - 1 ? ', ' : ''}`)}
-            </span>
-          </div>
-          <div className="r2">
-            <img className="tech-icon" width="10" src={`${iconsCdn}${tech.icon}`} alt={tech.name} />
-            <div>
-            <p className="tech-description">{tech.description}</p>
-            <p className="tech-website">Learn more at: <a href={tech.website}>{tech.website}</a></p>
+          <TechStackRow key={`tech-stack-row-${index}`}>
+            <div className="r1">
+              <Heading as="h4" size="small">
+                {tech.name}
+                <span className="tech-version">{tech.version ? `(v${tech.version})` : ''}</span>
+              </Heading>
+              <span className="tech-confidence" title={`${tech.confidence}% certain`}>Certainty: {tech.confidence}%</span>
+              <span className="tech-categories">
+                {categories.length
+                  ? categories.map((cat: any, i: number) => `${cat.name}${i < categories.length - 1 ? ', ' : ''}`)
+                  : 'Uncategorized'}
+              </span>
             </div>
-          </div>
-          
-        </TechStackRow>
+            <div className="r2">
+              {iconSrc && (
+                <img className="tech-icon" width="10" src={iconSrc} alt={tech.name} />
+              )}
+              <div>
+                <p className="tech-description">{tech.description}</p>
+                {website && (
+                  <p className="tech-website">Learn more at: <a href={website}>{website}</a></p>
+                )}
+              </div>
+            </div>
+
+          </TechStackRow>
         );
       })}
     </Card>

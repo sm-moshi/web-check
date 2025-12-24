@@ -123,10 +123,10 @@ export interface TechnologyGroup {
 }
 
 export const makeTechnologies = (response: any): TechnologyGroup[] => {
-  let flatArray = response.Results[0].Result.Paths
+  const flatArray = response.Results[0].Result.Paths
     .reduce((accumulator: any, obj: any) => accumulator.concat(obj.Technologies), []);
-  let technologies = flatArray.reduce((groups: any, item: any) => {
-    let tag = item.Tag;
+  const technologies = flatArray.reduce((groups: any, item: any) => {
+    const tag = item.Tag;
     if (!groups[tag]) groups[tag] = [];
     groups[tag].push(item);
     return groups;

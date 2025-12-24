@@ -1,7 +1,7 @@
 import { Card } from 'web-check-live/components/Form/Card';
 import colors from 'web-check-live/styles/colors';
 import Row from 'web-check-live/components/Form/Row';
-import Heading  from 'web-check-live/components/Form/Heading';
+import Heading from 'web-check-live/components/Form/Heading';
 
 const styles = `
   .content {
@@ -42,17 +42,22 @@ const SiteFeaturesCard = (props: { data: any, title: string, actionButtons: any 
   return (
     <Card heading={props.title} actionButtons={props.actionButtons} styles={styles}>
       <div className="content">
-        { (features?.groups || []).filter((group: any) => group.categories.length > 0).map((group: any, index: number) => (
+        {(features?.groups || []).filter((group: any) => group.categories.length > 0).map((group: any, index: number) => (
           <div key={`${group.name}-${index}`}>
-          <Heading as="h4" size="small" color={colors.primary}>{group.name}</Heading>
-          { group.categories.map((category: any, subIndex: number) => (
-            // <Row lbl={category.name} val={category.live} />
-            <Row lbl="" val="" key={`${category.name}-${subIndex}`}>
-              <span className="lbl">{category.name}</span>
-              <span className="val">{category.live} Live {category.dead ? `(${category.dead} dead)` : ''}</span>
-            </Row>
-          ))
-          }
+            <Heading as="h4" size="small" color={colors.primary}>{group.name}</Heading>
+            {group.categories.map((category: any, subIndex: number) => {
+              const liveLabel = typeof category.live === 'string'
+                ? category.live
+                : `${category.live} Live`;
+              return (
+                // <Row lbl={category.name} val={category.live} />
+                <Row lbl="" val="" key={`${category.name}-${subIndex}`}>
+                  <span className="lbl">{category.name}</span>
+                  <span className="val">{liveLabel} {category.dead ? `(${category.dead} dead)` : ''}</span>
+                </Row>
+              )
+            })
+            }
           </div>
         ))
         }

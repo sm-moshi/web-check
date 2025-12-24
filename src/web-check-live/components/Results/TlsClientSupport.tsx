@@ -5,15 +5,15 @@ import Button from 'web-check-live/components/Form/Button';
 import { ExpandableRow } from 'web-check-live/components/Form/Row';
 
 const makeClientSupport = (results: any) => {
-  if (!results?.analysis || results.analysis.length <1) return [];
+  if (!results?.analysis || results.analysis.length < 1) return [];
   const target = results.target;
   const sslLabsClientSupport = (
-      results.analysis.find((a: any) => a.analyzer === 'sslLabsClientSupport')
-    ).result;
+    results.analysis.find((a: any) => a.analyzer === 'sslLabsClientSupport')
+  ).result;
 
   return sslLabsClientSupport.map((sup: any) => {
     return {
-      title: `${sup.name} ${sup.platform ?  `(on ${sup.platform})`: sup.version}`,
+      title: `${sup.name} ${sup.platform ? `(on ${sup.platform})` : sup.version}`,
       value: sup.is_supported ? '✅' : '❌',
       fields: sup.is_supported ? [
         sup.curve ? { lbl: 'Curve', val: sup.curve } : {},
@@ -23,17 +23,19 @@ const makeClientSupport = (results: any) => {
         { lbl: 'Cipher Suite Code', val: sup.ciphersuite_code },
         { lbl: 'Curve Code', val: sup.curve_code },
       ] : [
-        { lbl: '', val: '',
-        plaintext: `The host ${target} does not support ${sup.name} `
-          +`${sup.version ?  `version ${sup.version} `: ''} `
-          + `${sup.platform ?  `on ${sup.platform} `: ''}`}
+        {
+          lbl: '', val: '',
+          plaintext: `The host ${target} does not support ${sup.name} `
+            + `${sup.version ? `version ${sup.version} ` : ''} `
+            + `${sup.platform ? `on ${sup.platform} ` : ''}`
+        }
       ],
     };
   });
-  
+
 };
 
-const TlsCard = (props: {data: any, title: string, actionButtons: any }): JSX.Element => {
+const TlsCard = (props: { data: any, title: string, actionButtons: any }): JSX.Element => {
 
   const [clientSupport, setClientSupport] = useState(makeClientSupport(props.data));
   const [loadState, setLoadState] = useState<undefined | 'loading' | 'success' | 'error'>(undefined);
@@ -51,25 +53,25 @@ const TlsCard = (props: {data: any, title: string, actionButtons: any }): JSX.El
       .then((data) => {
         setClientSupport(makeClientSupport(data));
         setLoadState('success');
-    }).catch(() => {
-      setLoadState('error');
-    });
+      }).catch(() => {
+        setLoadState('error');
+      });
   };
-  
+
   const scanId = props.data?.id;
   return (
     <Card heading={props.title} actionButtons={props.actionButtons}>
       {clientSupport.map((support: any, index: number) => {
         return (
-        <ExpandableRow
-          key={`tls-client-${index}`}
-          lbl={support.title}
-          val={support.value || '?'}
-          rowList={support.fields}
-        />
-      )
+          <ExpandableRow
+            key={`tls-client-${index}`}
+            lbl={support.title}
+            val={support.value || '?'}
+            rowList={support.fields}
+          />
+        )
       })}
-      { !clientSupport.length && (
+      {!clientSupport.length && (
         <div>
           <p>No entries available to analyze.<br />
             This sometimes happens when the report didn't finish generating in-time, you can try re-requesting it.

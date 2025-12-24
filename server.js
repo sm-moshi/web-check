@@ -12,6 +12,7 @@ dotenv.config();
 
 // Create the Express app
 const app = express();
+app.disable('x-powered-by');
 
 const __filename = new URL(import.meta.url).pathname;
 const __dirname = path.dirname(__filename);
@@ -39,7 +40,7 @@ const limits = [
 // Construct a message to be returned if the user has been rate-limited
 const makeLimiterResponseMsg = (retryAfter) => {
   const why = 'This keeps the service running smoothly for everyone. '
-  + 'You can get around these limits by running your own instance of Web Check.';
+    + 'You can get around these limits by running your own instance of Web Check.';
   return `You've been rate-limited, please try again in ${retryAfter} seconds.\n${why}`;
 };
 
@@ -81,16 +82,16 @@ fs.readdirSync(dirPath, { withFileTypes: true })
 const renderPlaceholderPage = async (res, msgId, logs) => {
   const errorMessages = {
     notCompiled: 'Looks like the GUI app has not yet been compiled.<br />'
-    + 'Run <code>yarn build</code> to continue, then restart the server.',
+      + 'Run <code>yarn build</code> to continue, then restart the server.',
     notCompiledSsrHandler: 'Server-side rendering failed to initiate, as SSR handler not found.<br />'
-    + 'This can be fixed by running <code>yarn build</code>, then restarting the server.<br />',
-    disabledGui:  'Web-Check API is up and running!<br />Access the endpoints at '
-    + `<a href="${API_DIR}"><code>${API_DIR}</code></a>`,
+      + 'This can be fixed by running <code>yarn build</code>, then restarting the server.<br />',
+    disabledGui: 'Web-Check API is up and running!<br />Access the endpoints at '
+      + `<a href="${API_DIR}"><code>${API_DIR}</code></a>`,
   };
   const logOutput = logs ? `<div class="logs"><code>${logs}</code></div>` : '';
   const errorMessage = (errorMessages[msgId] || 'An mystery error occurred.') + logOutput;
   const placeholderContent = await fs.promises.readFile(placeholderFilePath, 'utf-8');
-  const htmlContent = placeholderContent.replace('<!-- CONTENT -->', errorMessage );
+  const htmlContent = placeholderContent.replace('<!-- CONTENT -->', errorMessage);
   res.status(500).send(htmlContent);
 };
 
@@ -100,25 +101,26 @@ app.get(API_DIR, async (req, res) => {
   const { url } = req.query;
   const maxExecutionTime = process.env.API_TIMEOUT_LIMIT || 20000;
 
-  const executeHandler = async (handler, req) => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const mockRes = {
-          status: () => mockRes,
-          json: (body) => resolve({ body }),
-        };
-        await handler({ ...req, query: { url } }, mockRes);
-      } catch (err) {
-        reject(err);
-      }
-    });
-  };
+const executeHandler = (handler, req) => {
+  return new Promise((resolve, reject) => {
+    try {
+      const mockRes = {
+        status: () => mockRes,
+        json: (body) => resolve({ body }),
+      };
+      const result = handler({ ...req, query: { url } }, mockRes);
+      Promise.resolve(result).catch(reject);
+    } catch (err) {
+      reject(err);
+    }
+  });
+};
 
   const timeout = (ms, jobName = null) => {
     return new Promise((_, reject) => {
       setTimeout(() => {
         reject(new Error(
-          `Timed out after ${ms/1000} seconds${jobName ? `, when executing ${jobName}` : ''}`
+          `Timed out after ${ms / 1000} seconds${jobName ? `, when executing ${jobName}` : ''}`
         ));
       }, ms);
     });
@@ -168,7 +170,7 @@ if (process.env.DISABLE_GUI && process.env.DISABLE_GUI !== 'false') {
     }).catch(async err => {
       renderPlaceholderPage(res, 'notCompiledSsrHandler', err.message);
     });
-  });  
+  });
 }
 
 // Handle SPA routing
@@ -199,7 +201,7 @@ const printMessage = () => {
     `\x1b[0m\n`,
     `\x1b[1m\x1b[32m🚀 Web-Check is up and running at http://localhost:${port} \x1b[0m\n\n`,
     `\x1b[2m\x1b[36m🛟 For documentation and support, visit the GitHub repo: ` +
-    `https://github.com/lissy93/web-check \n`,
+    `https://github.com/sm-moshi/web-check \n`,
     `💖 Found Web-Check useful? Consider sponsoring us on GitHub ` +
     `to help fund maintenance & development.\x1b[0m`
   );
@@ -209,4 +211,3 @@ const printMessage = () => {
 app.listen(port, () => {
   printMessage();
 });
-

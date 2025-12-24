@@ -7,7 +7,7 @@ import Footer from 'web-check-live/components/misc/Footer';
 import Nav from 'web-check-live/components/Form/Nav';
 import Button from 'web-check-live/components/Form/Button';
 import { StyledCard } from 'web-check-live/components/Form/Card';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 
 interface ErrorBoundaryState {
   hasError: boolean;
@@ -70,13 +70,13 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
   static getDerivedStateFromError(err: Error): ErrorBoundaryState {
     return { hasError: true, errorCount: 0, errorMessage: err.message };
   }
-  
+
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     console.error("Uncaught error:", error, errorInfo);
     console.error(
       `%cCritical Error%c\n\nRoute or component failed to mount%c:%c\n`
-      +`${this.state.errorCount < 1? 'Will attempt a page reload' : ''}. `
+      + `${this.state.errorCount < 1 ? 'Will attempt a page reload' : ''}. `
       + `Error Details:\n${error}\n\n${JSON.stringify(errorInfo || {})}`,
       `background: ${colors.danger}; color:${colors.background}; padding: 4px 8px; font-size: 16px;`,
       `font-weight: bold; color: ${colors.danger};`,
@@ -109,10 +109,10 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
                 Usually reloading the page will resolve this, but if it doesn't, please raise a bug report.
               </p>
               {this.state.errorMessage && (
-              <p>
-                Below is the error message we received:<br /><br />
-                <ErrorMessageText>{this.state.errorMessage}</ErrorMessageText>
-              </p>
+                <p>
+                  Below is the error message we received:<br /><br />
+                  <ErrorMessageText>{this.state.errorMessage}</ErrorMessageText>
+                </p>
               )}
             </ErrorDetails>
             <Button onClick={() => window.location.reload()}>Reload Page</Button>

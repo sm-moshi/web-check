@@ -47,8 +47,8 @@ const StyledHeading = styled.h1<HeadingProps>`
       case 'center': return 'text-align: center; justify-content: center;';
     }
   }};
-  ${props => props.color ? `color: ${props.color};` : '' }
-  ${props => props.inline ? 'display: inline;' : '' }
+  ${props => props.color ? `color: ${props.color};` : ''}
+  ${props => props.inline ? 'display: inline;' : ''}
 `;
 
 const makeAnchor = (title: string): string => {

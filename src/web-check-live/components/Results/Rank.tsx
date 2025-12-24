@@ -19,7 +19,7 @@ span.val {
 }
 `;
 
-const makeRankStats = (data: {date: string, rank: number }[]) => {
+const makeRankStats = (data: { date: string, rank: number }[]) => {
   const average = Math.round(data.reduce((acc, cur) => acc + cur.rank, 0) / data.length);
   const today = data[0].rank;
   const yesterday = data[1].rank;
@@ -30,7 +30,7 @@ const makeRankStats = (data: {date: string, rank: number }[]) => {
   };
 };
 
-const makeChartData = (data: {date: string, rank: number }[]) => {
+const makeChartData = (data: { date: string, rank: number }[]) => {
   return data.map((d) => {
     return {
       date: d.date,
@@ -63,7 +63,7 @@ const RankCard = (props: { data: any, title: string, actionButtons: any }): JSX.
   return (
     <Card heading={props.title} actionButtons={props.actionButtons} styles={cardStyles}>
       <div className="rank-average">{data[0].rank.toLocaleString()}</div>
-      <Row lbl="Change since Yesterday" val={`${percentageChange > 0 ? '+':''} ${percentageChange.toFixed(2)}%`} />
+      <Row lbl="Change since Yesterday" val={`${percentageChange > 0 ? '+' : ''} ${percentageChange.toFixed(2)}%`} />
       <Row lbl="Historical Average Rank" val={average.toLocaleString()} />
       <div className="chart-container">
         {Chart(chartData, data)}

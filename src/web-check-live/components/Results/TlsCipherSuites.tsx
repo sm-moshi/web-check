@@ -12,19 +12,20 @@ const makeCipherSuites = (results: any) => {
     return {
       title: ciphersuite.cipher,
       fields: [
-      { lbl: 'Code', val: ciphersuite.code },
-      { lbl: 'Protocols', val: ciphersuite.protocols.join(', ') },
-      { lbl: 'Pubkey', val: ciphersuite.pubkey },
-      { lbl: 'Sigalg', val: ciphersuite.sigalg },
-      { lbl: 'Ticket Hint', val: ciphersuite.ticket_hint },
-      { lbl: 'OCSP Stapling', val: ciphersuite.ocsp_stapling ? '✅ Enabled' : '❌ Disabled' },
-      { lbl: 'PFS', val: ciphersuite.pfs },
-      ciphersuite.curves ? { lbl: 'Curves', val: ciphersuite.curves.join(', ') } : {},
-    ]};
+        { lbl: 'Code', val: ciphersuite.code },
+        { lbl: 'Protocols', val: ciphersuite.protocols.join(', ') },
+        { lbl: 'Pubkey', val: ciphersuite.pubkey },
+        { lbl: 'Sigalg', val: ciphersuite.sigalg },
+        { lbl: 'Ticket Hint', val: ciphersuite.ticket_hint },
+        { lbl: 'OCSP Stapling', val: ciphersuite.ocsp_stapling ? '✅ Enabled' : '❌ Disabled' },
+        { lbl: 'PFS', val: ciphersuite.pfs },
+        ciphersuite.curves ? { lbl: 'Curves', val: ciphersuite.curves.join(', ') } : {},
+      ]
+    };
   });
 };
 
-const TlsCard = (props: {data: any, title: string, actionButtons: any }): JSX.Element => {
+const TlsCard = (props: { data: any, title: string, actionButtons: any }): JSX.Element => {
 
   const [cipherSuites, setCipherSuites] = useState(makeCipherSuites(props.data));
   const [loadState, setLoadState] = useState<undefined | 'loading' | 'success' | 'error'>(undefined);
@@ -42,20 +43,20 @@ const TlsCard = (props: {data: any, title: string, actionButtons: any }): JSX.El
       .then((data) => {
         setCipherSuites(makeCipherSuites(data));
         setLoadState('success');
-    }).catch((error) => {
-      setLoadState('error');
-    });
+      }).catch(() => {
+        setLoadState('error');
+      });
   };
-  
+
   const scanId = props.data?.id;
   return (
     <Card heading={props.title} actionButtons={props.actionButtons}>
-      { cipherSuites.length && cipherSuites.map((cipherSuite: any, index: number) => {
+      {cipherSuites.length && cipherSuites.map((cipherSuite: any, index: number) => {
         return (
           <ExpandableRow key={`tls-cipher-${index}`} lbl={cipherSuite.title} val="" rowList={cipherSuite.fields} />
         );
       })}
-      { !cipherSuites.length && (
+      {!cipherSuites.length && (
         <div>
           <p>No cipher suites found.<br />
             This sometimes happens when the report didn't finish generating in-time, you can try re-requesting it.

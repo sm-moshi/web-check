@@ -16,10 +16,10 @@ const ServerStatusCard = (props: { data: any, title: string, actionButtons: any 
     <Card heading={props.title.toString()} actionButtons={props.actionButtons} styles={cardStyles}>
       <Row lbl="" val="">
         <span className="lbl">Is Up?</span>
-        { serverStatus.isUp ? <span className="val up">✅ Online</span> : <span className="val down">❌ Offline</span>}
+        {serverStatus.isUp ? <span className="val up">✅ Online</span> : <span className="val down">❌ Offline</span>}
       </Row>
       <Row lbl="Status Code" val={serverStatus.responseCode} />
-      { serverStatus.responseTime && <Row lbl="Response Time" val={`${Math.round(serverStatus.responseTime)}ms`} /> }
+      {serverStatus.responseTime && <Row lbl="Response Time" val={`${Math.round(serverStatus.responseTime)}ms`} />}
     </Card>
   );
 }

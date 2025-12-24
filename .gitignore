@@ -28,6 +28,7 @@ node_modules/
 .yarn/install-state.gz
 .pnpm/
 .pnp.*
+.cache/
 
 # ------------------------
 #            LOGS

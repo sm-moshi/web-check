@@ -10,10 +10,10 @@ const OpenPortsCard = (props: { data: any, title: string, actionButtons: any }):
   return (
     <Card heading={props.title} actionButtons={props.actionButtons} styles={cardStyles}>
       {portData.openPorts.map((port: any) => (
-          <Row key={port} lbl="" val="">
-            <span>{port}</span>
-          </Row>
-        )
+        <Row key={port} lbl="" val="">
+          <span>{port}</span>
+        </Row>
+      )
       )}
       <br />
       <small>

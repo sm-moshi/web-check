@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import colors from 'web-check-live/styles/colors';
 
 const StyledFooter = styled.footer`
@@ -23,7 +23,7 @@ const StyledFooter = styled.footer`
   }
   span {
     margin: 0 0.5rem;
-    text-align: center; 
+    text-align: center;
   }
 `;
 
@@ -46,16 +46,16 @@ const Footer = (props: { isFixed?: boolean }): JSX.Element => {
   const authorUrl = 'https://aliciasykes.com';
   const githubUrl = 'https://github.com/lissy93/web-check';
   return (
-  <StyledFooter style={props.isFixed ? {position: 'fixed'} : {}}>
-    <span>
-      View source at <ALink href={githubUrl}>github.com/lissy93/web-check</ALink>
-    </span>
-    <span>
-      <Link to="/about">Web-Check</Link> is
-      licensed under <ALink href={licenseUrl}>MIT</ALink> -
-      © <ALink href={authorUrl}>Alicia Sykes</ALink> 2023
-    </span>
-  </StyledFooter>
+    <StyledFooter style={props.isFixed ? { position: 'fixed' } : {}}>
+      <span>
+        View source at <ALink href={githubUrl}>github.com/lissy93/web-check</ALink>
+      </span>
+      <span>
+        <Link to="/about">Web-Check</Link> is
+        licensed under <ALink href={licenseUrl}>MIT</ALink> -
+        © <ALink href={authorUrl}>Alicia Sykes</ALink> 2023
+      </span>
+    </StyledFooter>
   );
 }
 

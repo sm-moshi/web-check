@@ -1,8 +1,41 @@
-import dns from 'dns';
+import { promises as dns } from 'dns';
 import URL from 'url-parse';
 import middleware from './_common/middleware.js';
 
-// TODO: Fix.
+// Helper to more safely detect Bluehost-related TXT records without naive substring matching.
+const isBluehostTxtRecord = (recordString) => {
+  // Quick check to avoid unnecessary work when Bluehost is not mentioned at all.
+  if (!recordString || !recordString.includes('bluehost.com')) {
+    return false;
+  }
+
+  // Split into tokens (e.g. SPF mechanisms) and look for include:/redirect= entries
+  // that explicitly reference bluehost.com as the domain.
+  const tokens = recordString.split(/\s+/);
+  for (const token of tokens) {
+    if (token.startsWith('include:')) {
+      const domain = token.slice('include:'.length).toLowerCase();
+      if (domain === 'bluehost.com') {
+        return true;
+      }
+    } else if (token.startsWith('redirect=')) {
+      const domain = token.slice('redirect='.length).toLowerCase();
+      if (domain === 'bluehost.com') {
+        return true;
+      }
+    }
+  }
+
+  return false;
+};
+
+// Helper to safely detect Mimecast MX hosts without naive substring matching.
+// Accepts 'mimecast.com' and any subdomain that ends with '.mimecast.com'.
+const isMimecastHost = (hostname) => {
+  if (!hostname) return false;
+  const lower = hostname.toLowerCase();
+  return lower === 'mimecast.com' || lower.endsWith('.mimecast.com');
+};
 
 const mailConfigHandler = async (url, event, context) => {
   try {
@@ -26,7 +59,7 @@ const mailConfigHandler = async (url, event, context) => {
         recordString.startsWith('MS=') || // Microsoft 365
         recordString.startsWith('zoho-verification=') || // Zoho
         recordString.startsWith('titan-verification=') || // Titan
-        recordString.includes('bluehost.com') // BlueHost
+        isBluehostTxtRecord(recordString) // BlueHost
       );
     });
 
@@ -43,7 +76,7 @@ const mailConfigHandler = async (url, event, context) => {
         return { provider: 'Zoho', value: recordString.split('=')[1] };
       } else if (recordString.startsWith('titan-verification=')) {
         return { provider: 'Titan', value: recordString.split('=')[1] };
-      } else if (recordString.includes('bluehost.com')) {
+      } else if (isBluehostTxtRecord(recordString)) {
         return { provider: 'BlueHost', value: recordString };
       } else {
         return null;
@@ -56,16 +89,16 @@ const mailConfigHandler = async (url, event, context) => {
       mailServices.push({ provider: 'Yahoo', value: yahooMx[0].exchange });
     }
     // Check MX records for Mimecast
-    const mimecastMx = mxRecords.filter(record => record.exchange.includes('mimecast.com'));
+    const mimecastMx = mxRecords.filter(record => isMimecastHost(record.exchange));
     if (mimecastMx.length > 0) {
       mailServices.push({ provider: 'Mimecast', value: mimecastMx[0].exchange });
     }
 
     return {
-        mxRecords,
-        txtRecords: emailTxtRecords,
-        mailServices,
-      };
+      mxRecords,
+      txtRecords: emailTxtRecords,
+      mailServices,
+    };
   } catch (error) {
     if (error.code === 'ENOTFOUND' || error.code === 'ENODATA') {
       return { skipped: 'No mail server in use on this domain' };

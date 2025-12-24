@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.20@sha256:26147acbda4f14c5add9946e2fd2ed543fc402884fd75146bd342a7f6271dc1d
 
-ARG NODE_VERSION=22.21.1
+ARG NODE_VERSION=24.12.0
 ARG DEBIAN_VERSION=trixie-slim
 
 # ----------------------------
@@ -26,7 +26,7 @@ ENV PUPPETEER_SKIP_DOWNLOAD=1 \
 # deps first (cache)
 COPY package.json yarn.lock .yarnrc.yml ./
 COPY scripts ./scripts
-RUN yarn install --frozen-lockfile
+RUN yarn install
 
 # build
 COPY . .
@@ -62,7 +62,7 @@ RUN useradd --create-home --uid 10001 --shell /usr/sbin/nologin webcheck
 # install ONLY production deps (no dev deps)
 COPY package.json yarn.lock .yarnrc.yml ./
 RUN YARN_IGNORE_SCRIPTS=1 yarn install --frozen-lockfile --production=true \
-    && yarn cache clean --all || true \
+    && (yarn cache clean --all || true) \
     && rm -rf node_modules/esbuild node_modules/@esbuild
 
 # copy only runtime artifacts

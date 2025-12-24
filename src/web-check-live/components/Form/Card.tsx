@@ -5,7 +5,7 @@ import ErrorBoundary from 'web-check-live/components/misc/ErrorBoundary';
 import Heading from 'web-check-live/components/Form/Heading';
 import colors from 'web-check-live/styles/colors';
 
-export const StyledCard = styled.section<{ styles?: string}>`
+export const StyledCard = styled.section<{ styles?: string }>`
   background: ${colors.backgroundLighter};
   color: ${colors.textColor};
   box-shadow: 4px 4px 0px ${colors.bgShadowColor};
@@ -30,8 +30,8 @@ export const Card = (props: CardProps): JSX.Element => {
   return (
     <ErrorBoundary title={heading}>
       <StyledCard styles={styles}>
-        { actionButtons && actionButtons }
-        { heading && <Heading className="inner-heading" as="h3" align="left" color={colors.primary}>{heading}</Heading> }
+        {actionButtons && actionButtons}
+        {heading && <Heading className="inner-heading" as="h3" align="left" color={colors.primary}>{heading}</Heading>}
         {children}
       </StyledCard>
     </ErrorBoundary>

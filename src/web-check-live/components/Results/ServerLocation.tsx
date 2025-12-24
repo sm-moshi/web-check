@@ -41,7 +41,7 @@ const ServerLocationCard = (props: { data: ServerLocation, title: string, action
         <b>Country</b>
         <CountryValue>
           {country}
-          { countryCode && <Flag countryCode={countryCode} width={28} /> }
+          {countryCode && <Flag countryCode={countryCode} width={28} />}
         </CountryValue>
       </Row>
       <Row lbl="Timezone" val={timezone} />

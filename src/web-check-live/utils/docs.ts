@@ -308,12 +308,11 @@ const docs: Doc[] = [
     id: 'tech-stack',
     title: 'Tech Stack',
     description: 'Checks what technologies a site is built with. '
-    + 'This is done by fetching and parsing the site, then comparing it against a bit list of RegEx maintained by Wappalyzer to identify the unique fingerprints that different technologies leave.',
+    + 'This is done by fetching and parsing the site, then comparing it against known fingerprints provided by the configured tech stack provider.',
     use: 'Identifying a website\'s tech stack aids in evaluating its security by exposing potential vulnerabilities, '
     + 'informs competitive analyses and development decisions, and can guide tailored marketing strategies. '
     + 'Ethical application of this knowledge is crucial to avoid harmful activities like data theft or unauthorized intrusion.',
     resources: [
-      { title: 'Wappalyzer fingerprints', link: 'https://github.com/wappalyzer/wappalyzer/tree/master/src/technologies'},
       { title: 'BuiltWith - Check what tech a site is using', link: 'https://builtwith.com/'},
     ],
     screenshot: 'https://i.ibb.co/bBQSQNz/Screenshot-from-2023-08-12-15-43-46.png',

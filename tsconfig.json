@@ -10,7 +10,11 @@
         "name": "@astrojs/ts-plugin"
       }
     ],
-    "lib": ["DOM", "DOM.Iterable", "ES2023"],
+    "lib": [
+      "DOM",
+      "DOM.Iterable",
+      "ES2023"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -23,17 +27,46 @@
     "noEmit": true,
     "jsx": "react-jsx",
     "jsxImportSource": "react",
-    "types": ["astro/client", "vite/client", "react", "react-dom"],
+    "types": [
+      "astro/client",
+      "vite/client",
+      "react",
+      "react-dom"
+    ],
     "baseUrl": "src",
     "paths": {
-      "@/*": ["*"],
-      "@components/*": ["components/*"],
-      "@layouts/*": ["layouts/*"],
-      "@pages/*": ["pages/*"],
-      "@styles/*": ["styles/*"],
-      "@assets/*": ["assets/*"]
+      "@/*": [
+        "*"
+      ],
+      "@components/*": [
+        "components/*"
+      ],
+      "@layouts/*": [
+        "layouts/*"
+      ],
+      "@pages/*": [
+        "pages/*"
+      ],
+      "@styles/*": [
+        "styles/*"
+      ],
+      "@assets/*": [
+        "assets/*"
+      ]
     }
   },
-  "include": ["src", ".astro/types.d.ts"],
-  "exclude": ["dist"]
+  "include": [
+    "src",
+    ".astro/types.d.ts",
+    "api/**/*.js",
+    "scripts/**/*.{cjs,js}",
+    "astro.config.mjs",
+    "eslint.config.ts",
+    "server.js",
+    "svelte.config.js",
+    "vite.config.js"
+  ],
+  "exclude": [
+    "dist"
+  ]
 }

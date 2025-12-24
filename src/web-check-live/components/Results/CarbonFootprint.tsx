@@ -15,7 +15,7 @@ const CarbonCard = (props: { data: any, title: string, actionButtons: any }): JS
   const carbons = props.data.statistics;
   const initialUrl = props.data.scanUrl;
 
-  const [carbonData, setCarbonData] = useState<{c?: number, p?: number}>({});
+  const [carbonData, setCarbonData] = useState<{ c?: number, p?: number }>({});
 
   useEffect(() => {
     const fetchCarbonData = async () => {
@@ -32,8 +32,8 @@ const CarbonCard = (props: { data: any, title: string, actionButtons: any }): JS
 
   return (
     <Card heading={props.title} actionButtons={props.actionButtons}>
-      { (!carbons?.adjustedBytes && !carbonData.c) && <p>Unable to calculate carbon footprint for host</p>}
-      { carbons?.adjustedBytes > 0 && <>
+      {(!carbons?.adjustedBytes && !carbonData.c) && <p>Unable to calculate carbon footprint for host</p>}
+      {carbons?.adjustedBytes > 0 && <>
         <Row lbl="HTML Initial Size" val={`${carbons.adjustedBytes} bytes`} />
         <Row lbl="CO2 for Initial Load" val={`${(carbons.co2.grid.grams * 1000).toPrecision(4)} grams`} />
         <Row lbl="Energy Usage for Load" val={`${(carbons.energy * 1000).toPrecision(4)} KWg`} />

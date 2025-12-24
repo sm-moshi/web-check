@@ -15,21 +15,39 @@ const sitemapHandler = async (url) => {
     } catch (error) {
       if (error.response && error.response.status === 404) {
         // If sitemap not found, try to fetch it from robots.txt
-        const robotsRes = await axios.get(`${url}/robots.txt`, { timeout: hardTimeOut });
+        let robotsRes;
+        try {
+          robotsRes = await axios.get(`${url}/robots.txt`, { timeout: hardTimeOut });
+        } catch (robotsError) {
+          if (robotsError.response && robotsError.response.status === 404) {
+            return { skipped: 'No sitemap found' };
+          }
+          throw robotsError;
+        }
+
         const robotsTxt = robotsRes.data.split('\n');
+        let sitemapFromRobots = '';
 
         for (let line of robotsTxt) {
           if (line.toLowerCase().startsWith('sitemap:')) {
-            sitemapUrl = line.split(' ')[1].trim();
+            sitemapFromRobots = line.split(' ')[1].trim();
             break;
           }
         }
 
-        if (!sitemapUrl) {
+        if (!sitemapFromRobots) {
           return { skipped: 'No sitemap found' };
         }
 
-        sitemapRes = await axios.get(sitemapUrl, { timeout: hardTimeOut });
+        sitemapUrl = sitemapFromRobots;
+        try {
+          sitemapRes = await axios.get(sitemapUrl, { timeout: hardTimeOut });
+        } catch (sitemapFromRobotsError) {
+          if (sitemapFromRobotsError.response && sitemapFromRobotsError.response.status === 404) {
+            return { skipped: 'No sitemap found' };
+          }
+          throw sitemapFromRobotsError;
+        }
       } else {
         throw error; // If other error, throw it
       }
@@ -50,4 +68,3 @@ const sitemapHandler = async (url) => {
 
 export const handler = middleware(sitemapHandler);
 export default handler;
-

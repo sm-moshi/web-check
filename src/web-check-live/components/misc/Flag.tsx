@@ -8,8 +8,8 @@ const Flag = ({ countryCode, width }: Props): JSX.Element => {
   const getFlagUrl = (code: string, w: number = 64) => {
     const protocol = 'https';
     const cdn = 'flagcdn.com';
-    const dimensions = `${width}x${width * 0.75}`;
-    const country = countryCode.toLowerCase();
+    const dimensions = `${w}x${w * 0.75}`;
+    const country = code.toLowerCase();
     const ext = 'png';
     return `${protocol}://${cdn}/${dimensions}/${country}.${ext}`;
   };

@@ -2,11 +2,11 @@
 import { Card } from 'web-check-live/components/Form/Card';
 import Row from 'web-check-live/components/Form/Row';
 
-const BlockListsCard = (props: {data: any, title: string, actionButtons: any }): JSX.Element => {
+const BlockListsCard = (props: { data: any, title: string, actionButtons: any }): JSX.Element => {
   const blockLists = props.data.blocklists;
   return (
     <Card heading={props.title} actionButtons={props.actionButtons}>
-      { blockLists.map((blocklist: any, blockIndex: number) => (
+      {blockLists.map((blocklist: any, blockIndex: number) => (
         <Row
           title={blocklist.serverIp}
           lbl={blocklist.server}

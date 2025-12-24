@@ -24,7 +24,7 @@ const StyledButton = styled.button<ButtonProps>`
   border: none;
   border-radius: 0.25rem;
   font-family: PTMono;
-  box-sizing: border-box; 
+  box-sizing: border-box;
   width: -moz-available;
   display: flex;
   justify-content: center;
@@ -71,15 +71,15 @@ const Button = (props: ButtonProps): JSX.Element => {
   const { children, size, bgColor, fgColor, onClick, styles, title, loadState, type } = props;
   return (
     <StyledButton
-      onClick={onClick || (() => null) }
+      onClick={onClick || (() => null)}
       size={size}
       bgColor={bgColor}
       fgColor={fgColor}
       styles={styles}
       title={title?.toString()}
       type={type || 'button'}
-      >
-      { loadState && <Loader loadState={loadState} /> }
+    >
+      {loadState && <Loader loadState={loadState} />}
       {children}
     </StyledButton>
   );

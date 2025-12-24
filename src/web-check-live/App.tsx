@@ -1,4 +1,4 @@
-import { Routes, Route, Outlet } from 'react-router-dom';
+import { Routes, Route, Outlet } from 'react-router';
 
 import Home from 'web-check-live/views/Home.tsx';
 import Results from 'web-check-live/views/Results.tsx';
@@ -10,10 +10,10 @@ import GlobalStyles from './styles/globals.tsx';
 
 const Layout = () => {
   return (
-  <>
-    <GlobalStyles />
-    <Outlet />
-  </>
+    <>
+      <GlobalStyles />
+      <Outlet />
+    </>
   );
 }
 

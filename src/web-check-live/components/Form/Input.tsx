@@ -55,19 +55,19 @@ const Input = (inputProps: Props): JSX.Element => {
   const { id, value, label, placeholder, name, disabled, size, orientation, handleChange, handleKeyDown } = inputProps;
 
   return (
-  <InputContainer orientation={orientation}>
-    { label && <StyledLabel htmlFor={id} inputSize={size}>{ label }</StyledLabel> }
-    <StyledInput
-      id={id}
-      value={value}
-      placeholder={placeholder}
-      name={name}
-      disabled={disabled}
-      onChange={handleChange}
-      inputSize={size}
-      onKeyDown={handleKeyDown || (() => {})}
-    />
-  </InputContainer>
+    <InputContainer orientation={orientation}>
+      {label && <StyledLabel htmlFor={id} inputSize={size}>{label}</StyledLabel>}
+      <StyledInput
+        id={id}
+        value={value}
+        placeholder={placeholder}
+        name={name}
+        disabled={disabled}
+        onChange={handleChange}
+        inputSize={size}
+        onKeyDown={handleKeyDown || (() => { })}
+      />
+    </InputContainer>
   );
 };
 

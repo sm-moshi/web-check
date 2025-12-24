@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import { type ChangeEvent, type FormEvent, useState, useEffect } from 'react';
-import { Link, useNavigate, useLocation, type NavigateOptions } from 'react-router-dom';
+import { Link, useNavigate, useLocation, type NavigateOptions } from 'react-router';
 
 import Heading from 'web-check-live/components/Form/Heading';
 import Input from 'web-check-live/components/Form/Input'
@@ -147,12 +147,26 @@ const Home = (): JSX.Element => {
 
   const location = useLocation();
 
+  const encodeUrlForPath = (value: string): string => {
+    if (typeof globalThis.btoa !== 'function') {
+      const buffer = (globalThis as any).Buffer;
+      return buffer.from(value, 'utf8').toString('base64url');
+    }
+    const bytes = new TextEncoder().encode(value);
+    let binary = '';
+    bytes.forEach((byte) => {
+      binary += String.fromCharCode(byte);
+    });
+    const base64 = globalThis.btoa(binary);
+    return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  };
+
   /* Redirect strait to results, if somehow we land on /check?url=[] */
   useEffect(() => {
     const query = new URLSearchParams(location.search);
     const urlFromQuery = query.get('url');
     if (urlFromQuery) {
-      navigate(`/check/${encodeURIComponent(urlFromQuery)}`, { replace: true });
+      navigate(`/check/${encodeUrlForPath(urlFromQuery)}`, { replace: true });
     }
   }, [navigate, location.search]);
 
@@ -160,7 +174,7 @@ const Home = (): JSX.Element => {
   const submit = () => {
     let address = userInput.endsWith("/") ? userInput.slice(0, -1) : userInput;
     const addressType = determineAddressType(address);
-  
+
     if (addressType === 'empt') {
       setErrMsg('Field must not be empty');
     } else if (addressType === 'err') {
@@ -171,10 +185,10 @@ const Home = (): JSX.Element => {
         address = 'https://' + address;
       }
       const resultRouteParams: NavigateOptions = { state: { address, addressType } };
-      navigate(`/check/${encodeURIComponent(address)}`, resultRouteParams);
+      navigate(`/check/${encodeUrlForPath(address)}`, resultRouteParams);
     }
   };
-  
+
 
   /* Update user input state, and hide error message if field is valid */
   const inputChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -236,7 +250,7 @@ const Home = (): JSX.Element => {
           handleKeyDown={handleKeyPress}
         />
         {/* <FindIpButton onClick={findIpAddress}>Or, find my IP</FindIpButton> */}
-        { errorMsg && <ErrorMessage>{errorMsg}</ErrorMessage>}
+        {errorMsg && <ErrorMessage>{errorMsg}</ErrorMessage>}
         <Button type="submit" styles="width: calc(100% - 1rem);" size="large" onClick={submit}>Analyze!</Button>
       </UserInputMain>
       <SponsorCard>
@@ -258,11 +272,11 @@ const Home = (): JSX.Element => {
                 rel="noreferrer"
                 className="cta"
                 href="https://terminaltrove.com/newsletter?utm_campaign=github&utm_medium=referral&utm_content=web-check&utm_source=wcgh"
-                >
+              >
                 Terminal Trove newsletter
               </a>
             </span>
-            
+
           </p>
           <a
             target="_blank"
@@ -282,7 +296,7 @@ const Home = (): JSX.Element => {
           </ul>
         </div>
         <div className="links">
-          <a target="_blank" rel="noreferrer" href="https://github.com/lissy93/web-check" title="Check out the source code and documentation on GitHub, and get support or contribute">
+          <a target="_blank" rel="noreferrer" href="https://github.com/lissy93/web-check (& https://github.com/sm-moshi/web-check)" title="Check out the source code and documentation on GitHub, and get support or contribute">
             <Button>View on GitHub</Button>
           </a>
           <a target="_blank" rel="noreferrer" href="https://app.netlify.com/start/deploy?repository=https://github.com/lissy93/web-check" title="Deploy your own private or public instance of Web-Check to Netlify">

@@ -19,7 +19,7 @@ export const parseHeaderCookies = (cookiesHeader: string[]): Cookie[] => {
   return cookies;
 };
 
-const CookiesCard = (props: { data: any, title: string, actionButtons: any}): JSX.Element => {
+const CookiesCard = (props: { data: any, title: string, actionButtons: any }): JSX.Element => {
   const headerCookies = parseHeaderCookies(props.data.headerCookies) || [];
   const clientCookies = props.data.clientCookies || [];
   return (
@@ -36,7 +36,7 @@ const CookiesCard = (props: { data: any, title: string, actionButtons: any}): JS
       }
       {
         clientCookies.map((cookie: any) => {
-          const nameValPairs = Object.keys(cookie).map((key: string) => { return { lbl: key, val: cookie[key] }});
+          const nameValPairs = Object.keys(cookie).map((key: string) => { return { lbl: key, val: cookie[key] } });
           return (
             <ExpandableRow key={`cookie-${cookie.name}`} lbl={cookie.name} val="" rowList={nameValPairs} />
           );

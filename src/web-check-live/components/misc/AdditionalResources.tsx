@@ -26,7 +26,7 @@ li a.resource-wrap {
   border: none;
   border-radius: 0.25rem;
   font-family: PTMono;
-  box-sizing: border-box; 
+  box-sizing: border-box;
   width: -moz-available;
   box-shadow: 3px 3px 0px ${colors.backgroundDarker};
   &:hover {
@@ -268,7 +268,7 @@ const AdditionalResources = (props: { url?: string }): JSX.Element => {
             <li key={index}>
               <a className="resource-wrap" target="_blank" rel="noreferrer" href={makeLink(resource, props.url)}>
                 <p className="resource-title">{resource.title}</p>
-                <span className="resource-link" onClick={()=> window.open(resource.link, '_blank')} title={`Open: ${resource.link}`}>
+                <span className="resource-link" onClick={() => window.open(resource.link, '_blank')} title={`Open: ${resource.link}`}>
                   {new URL(resource.link).hostname}
                 </span>
                 <div className="resource-lower">

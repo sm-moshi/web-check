@@ -6,9 +6,9 @@ import middleware from './_common/middleware.js';
 const getBaseDomain = (url) => {
   let protocol = '';
   if (url.startsWith('http://')) {
-      protocol = 'http://';
+    protocol = 'http://';
   } else if (url.startsWith('https://')) {
-      protocol = 'https://';
+    protocol = 'https://';
   }
   let noProtocolUrl = url.replace(protocol, '');
   const parsed = psl.parse(noProtocolUrl);
@@ -17,9 +17,9 @@ const getBaseDomain = (url) => {
 
 const parseWhoisData = (data) => {
   if (data.includes('No match for')) {
-    return { error: 'No matches found for domain in internic database'};
+    return { error: 'No matches found for domain in internic database' };
   }
-  
+
   const lines = data.split('\r\n');
   const parsedData = {};
 

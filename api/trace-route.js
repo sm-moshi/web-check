@@ -5,6 +5,16 @@ import { resolvePublicHost } from './_common/host-guard.js';
 
 const execFileAsync = promisify(execFile);
 
+const parsePositiveInt = (value, fallback) => {
+  const parsed = Number.parseInt(value, 10);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
+};
+
+const parsePositiveFloat = (value, fallback) => {
+  const parsed = Number.parseFloat(value);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
+};
+
 const parseTracerouteOutput = (stdout) => {
   const lines = stdout.split('\n').map((line) => line.trim()).filter(Boolean);
   const results = [];
@@ -54,7 +64,16 @@ const traceRouteHandler = async (urlString, context) => {
 
   const { address } = await resolvePublicHost(host);
   const startTime = Date.now();
-  const { stdout } = await execFileAsync('traceroute', ['-n', '-w', '2', '-q', '3', address]);
+  const maxHops = parsePositiveInt(process.env.TRACEROUTE_MAX_HOPS, 15);
+  const timeoutSec = parsePositiveFloat(process.env.TRACEROUTE_TIMEOUT_SEC, 2);
+  const queries = parsePositiveInt(process.env.TRACEROUTE_QUERIES, 1);
+  const { stdout } = await execFileAsync('traceroute', [
+    '-n',
+    '-w', String(timeoutSec),
+    '-q', String(queries),
+    '-m', String(maxHops),
+    address,
+  ]);
   const result = parseTracerouteOutput(stdout);
 
   return {

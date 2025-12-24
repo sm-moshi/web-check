@@ -7,10 +7,12 @@ export const prerender = false;
 
 const { pathname, search } = new URL(Astro.request.url);
 
+const encodeUrlForPath = (value: string): string => Buffer.from(value, 'utf8').toString('base64url');
+
 const searchUrl = new URLSearchParams(search).get('url');
 
 if (searchUrl) {
-  Astro.redirect(`/check/${encodeURIComponent(searchUrl)}`);
+  Astro.redirect(`/check/${encodeUrlForPath(searchUrl)}`);
 }
 
 ---
@@ -22,9 +24,19 @@ if (searchUrl) {
 <script>
   // Fallback, if Astro hasn't initialized the RC comp yet, then check the url
   // And if form has been submitted with ?url=, redirect to the results page
+  const toBase64Url = (value: string): string => {
+    const bytes = new TextEncoder().encode(value);
+    let binary = '';
+    bytes.forEach((byte) => {
+      binary += String.fromCharCode(byte);
+    });
+    const base64 = btoa(binary);
+    return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  };
+
   const searchParams = new URL(window.location.href).searchParams;
   if (searchParams.has('url')) {
-    window.location.href = `/check/${encodeURIComponent(searchParams.get('url') || '')}`;
+    window.location.href = `/check/${toBase64Url(searchParams.get('url') || '')}`;
   }
 
   // And add a manual no-react form submit handler
@@ -34,7 +46,7 @@ if (searchUrl) {
       event.preventDefault();
       const input = (this as HTMLFormElement).querySelector<HTMLInputElement>('input[name="url"]');  
       if (input && input.value) {
-        window.location.href = `/check/${encodeURIComponent(input.value)}`;
+        window.location.href = `/check/${toBase64Url(input.value)}`;
       }
     });
   }

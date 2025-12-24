@@ -20,7 +20,7 @@ const parseHeader = (headerString: string): RowProps[] => {
   });
 };
 
-const HstsCard = (props: {data: any, title: string, actionButtons: any }): JSX.Element => {
+const HstsCard = (props: { data: any, title: string, actionButtons: any }): JSX.Element => {
   const hstsResults = props.data;
   const hstsHeaders = hstsResults?.hstsHeader ? parseHeader(hstsResults.hstsHeader) : [];
   return (

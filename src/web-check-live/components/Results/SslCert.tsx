@@ -31,10 +31,10 @@ const formatDate = (dateString: string): string => {
 const DataRow = (props: { lbl: string, val: string }) => {
   const { lbl, val } = props;
   return (
-  <Row>
-    <span className="lbl">{lbl}</span>
-    <span className="val" title={val}>{val}</span>
-  </Row>
+    <Row>
+      <span className="lbl">{lbl}</span>
+      <span className="val" title={val}>{val}</span>
+    </Row>
   );
 };
 
@@ -66,15 +66,16 @@ function getExtendedKeyUsage(oids: string[]) {
 const ListRow = (props: { list: string[], title: string }) => {
   const { list, title } = props;
   return (
-  <>
-    <Heading as="h3" size="small" align="left" color={colors.primary}>{title}</Heading>
-    { list.map((entry: string, index: number) => {
-      return (
-      <Row key={`${title.toLocaleLowerCase()}-${index}`}><span>{ entry }</span></Row>
+    <>
+      <Heading as="h3" size="small" align="left" color={colors.primary}>{title}</Heading>
+      {list.map((entry: string, index: number) => {
+        return (
+          <Row key={`${title.toLocaleLowerCase()}-${index}`}><span>{entry}</span></Row>
+        )
+      }
       )}
-    )}
-  </>
-);
+    </>
+  );
 }
 
 const SslCertCard = (props: { data: any, title: string, actionButtons: any }): JSX.Element => {
@@ -82,16 +83,16 @@ const SslCertCard = (props: { data: any, title: string, actionButtons: any }): J
   const { subject, issuer, fingerprint, serialNumber, asn1Curve, nistCurve, valid_to, valid_from, ext_key_usage } = sslCert;
   return (
     <Card heading={props.title} actionButtons={props.actionButtons}>
-      { subject && <DataRow lbl="Subject" val={subject?.CN} /> }
-      { issuer?.O && <DataRow lbl="Issuer" val={issuer.O} /> }
-      { asn1Curve && <DataRow lbl="ASN1 Curve" val={asn1Curve} /> }
-      { nistCurve && <DataRow lbl="NIST Curve" val={nistCurve} /> }
-      { valid_to && <DataRow lbl="Expires" val={formatDate(valid_to)} /> }
-      { valid_from && <DataRow lbl="Renewed" val={formatDate(valid_from)} /> }
-      { serialNumber && <DataRow lbl="Serial Num" val={serialNumber} /> }
-      { fingerprint && <DataRow lbl="Fingerprint" val={fingerprint} /> }
-      { ext_key_usage && <ListRow title="Extended Key Usage" list={getExtendedKeyUsage(ext_key_usage)} /> }
-      
+      {subject && <DataRow lbl="Subject" val={subject?.CN} />}
+      {issuer?.O && <DataRow lbl="Issuer" val={issuer.O} />}
+      {asn1Curve && <DataRow lbl="ASN1 Curve" val={asn1Curve} />}
+      {nistCurve && <DataRow lbl="NIST Curve" val={nistCurve} />}
+      {valid_to && <DataRow lbl="Expires" val={formatDate(valid_to)} />}
+      {valid_from && <DataRow lbl="Renewed" val={formatDate(valid_from)} />}
+      {serialNumber && <DataRow lbl="Serial Num" val={serialNumber} />}
+      {fingerprint && <DataRow lbl="Fingerprint" val={fingerprint} />}
+      {ext_key_usage && <ListRow title="Extended Key Usage" list={getExtendedKeyUsage(ext_key_usage)} />}
+
     </Card>
   );
 }

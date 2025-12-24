@@ -40,7 +40,7 @@ const integrations = [svelte(), react(), partytown(), sitemap()];
 
 // Set the appropriate adapter, based on the deploy target
 function getAdapter(target) {
-  switch(target) {
+  switch (target) {
     case 'vercel':
       return vercelAdapter();
     case 'netlify':
@@ -74,12 +74,12 @@ if (!isBossServer && isBossServer !== true) {
 }
 
 // Export Astro configuration
-export default defineConfig({ 
-  output, 
-  base, 
-  integrations, 
-  site, 
-  adapter, 
+export default defineConfig({
+  output,
+  base,
+  integrations,
+  site,
+  adapter,
   redirects,
   vite: {
     resolve: {

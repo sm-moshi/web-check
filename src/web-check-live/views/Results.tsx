@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, type ReactNode } from 'react';
-import { useParams, useLocation } from 'react-router-dom';
+import { useParams } from 'react-router';
 import styled from '@emotion/styled';
 import { ToastContainer } from 'react-toastify';
 import Masonry from 'react-masonry-css'
@@ -7,13 +7,13 @@ import Masonry from 'react-masonry-css'
 import colors from 'web-check-live/styles/colors';
 import Heading from 'web-check-live/components/Form/Heading';
 import Modal from 'web-check-live/components/Form/Modal';
+import { Card } from 'web-check-live/components/Form/Card';
 import Footer from 'web-check-live/components/misc/Footer';
 import Nav from 'web-check-live/components/Form/Nav';
 import type { RowProps }  from 'web-check-live/components/Form/Row';
 
 import Loader from 'web-check-live/components/misc/Loader';
 import ErrorBoundary from 'web-check-live/components/misc/ErrorBoundary';
-import SelfScanMsg from 'web-check-live/components/misc/SelfScanMsg';
 import DocContent from 'web-check-live/components/misc/DocContent';
 import ProgressBar, { type LoadingJob, type LoadingState, initialJobs } from 'web-check-live/components/misc/ProgressBar';
 import ActionButtons from 'web-check-live/components/misc/ActionButtons';
@@ -77,6 +77,36 @@ const ResultsOuter = styled.div`
   }
   .masonry-grid-col section { margin: 1rem 0.5rem; }
 `;
+
+const StatusMessage = styled.pre`
+  white-space: pre-wrap;
+  background: ${colors.background};
+  border: 1px solid ${colors.backgroundDarker};
+  border-radius: 6px;
+  padding: 0.75rem;
+  font-size: 0.85rem;
+  color: ${colors.textColorSecondary};
+`;
+
+const StatusCard = (props: {
+  title: string;
+  status: LoadingState;
+  message?: string;
+  actionButtons?: ReactNode;
+}): JSX.Element => {
+  const { title, status, message, actionButtons } = props;
+  const statusLabel = status === 'skipped'
+    ? 'Skipped'
+    : status === 'timed-out'
+      ? 'Timed out'
+      : 'Unavailable';
+  return (
+    <Card heading={title} actionButtons={actionButtons}>
+      <p>{statusLabel}. {message ? 'Details below.' : 'No additional details provided.'}</p>
+      {message && <StatusMessage>{message}</StatusMessage>}
+    </Card>
+  );
+};
 
 const ResultsContent = styled.section`
   width: 95vw;
@@ -154,7 +184,32 @@ const FilterButtons = styled.div`
 const Results = (props: { address?: string } ): JSX.Element => {
   const startTime = new Date().getTime();
 
-  const address = props.address || useParams().urlToScan || '';
+  const decodeUrlFromPath = (value: string): string => {
+    if (!value) return '';
+    if (/%[0-9A-Fa-f]{2}/.test(value)) {
+      try {
+        return decodeURIComponent(value);
+      } catch {}
+    }
+
+    const normalized = value.replace(/-/g, '+').replace(/_/g, '/');
+    const padded = normalized.padEnd(Math.ceil(normalized.length / 4) * 4, '=');
+    try {
+      if (typeof globalThis.atob !== 'function') {
+        const buffer = (globalThis as any).Buffer;
+        return buffer.from(padded, 'base64').toString('utf8');
+      }
+      const binary = globalThis.atob(padded);
+      const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0));
+      return new TextDecoder().decode(bytes);
+    } catch {
+      return value;
+    }
+  };
+
+  const paramAddress = useParams().urlToScan || '';
+  const decodedParamAddress = decodeUrlFromPath(paramAddress);
+  const address = props.address || decodedParamAddress;
 
   const [ addressType, setAddressType ] = useState<AddressType>('empt');
 
@@ -305,7 +360,7 @@ const Results = (props: { address?: string } ): JSX.Element => {
       .then(res => res?.lighthouseResult || { error: res.error || 'No Data' }),
   });
 
-  // Get the technologies used to build site, using Wappalyzer
+  // Get the technologies used to build site
   const [techStackResults, updateTechStackResults] = useMotherHook({
     jobId: 'tech-stack',
     updateLoadingJobs,
@@ -318,9 +373,14 @@ const Results = (props: { address?: string } ): JSX.Element => {
     jobId: ['hosts', 'server-info'],
     updateLoadingJobs,
     addressInfo: { address: ipAddress, addressType: 'ipV4', expectedAddressTypes: ['ipV4', 'ipV6'] },
-    fetchRequest: () => fetch(`https://api.shodan.io/shodan/host/${ipAddress}?key=${keys.shodan}`)
-      .then(res => parseJson(res))
-      .then(res => parseShodanResults(res)),
+    fetchRequest: async () => {
+      if (!ipAddress) {
+        return Promise.resolve({ skipped: 'Shodan lookup requires an IP address.' });
+      }
+      const response = await fetch(`${api}/shodan?url=${ipAddress}`);
+      const data = await parseJson(response);
+      return data?.error || data?.skipped ? data : parseShodanResults(data);
+    },
   });
 
   // Fetch and parse cookies info
@@ -920,10 +980,17 @@ const Results = (props: { address?: string } ): JSX.Element => {
           {
             resultCardData
             .map(({ id, title, result, tags, refresh, Component }, index: number) => {
-              const show = (tags.length === 0 || tags.some(tag => tags.includes(tag)))
-              && title.toLowerCase().includes(searchTerm.toLowerCase())
-              && (result && !result.error);
-              return show ? (
+              const job = loadingJobs.find((entry) => entry.name === id);
+              const jobState = job?.state;
+              const jobMessage = job?.error;
+              const matchesTags = (tags.length === 0 || tags.some(tag => tags.includes(tag)));
+              const matchesSearch = title.toLowerCase().includes(searchTerm.toLowerCase());
+              const hasResult = Boolean(result && !result.error);
+              const showStatus = !hasResult && jobState && jobState !== 'loading';
+              if (!matchesTags || !matchesSearch) {
+                return null;
+              }
+              return hasResult ? (
                 <ErrorBoundary title={title} key={`eb-${index}`}>
                   <Component
                     key={`${title}-${index}`}
@@ -932,7 +999,17 @@ const Results = (props: { address?: string } ): JSX.Element => {
                     actionButtons={refresh ? makeActionButtons(title, refresh, () => showInfo(id)) : undefined}
                   />
                 </ErrorBoundary>
-            ) : null})
+              ) : showStatus ? (
+                <ErrorBoundary title={title} key={`eb-${index}`}>
+                  <StatusCard
+                    title={title}
+                    status={jobState}
+                    message={jobMessage}
+                    actionButtons={refresh ? makeActionButtons(title, refresh, () => showInfo(id)) : undefined}
+                  />
+                </ErrorBoundary>
+              ) : null;
+            })
           }
           </Masonry>
       </ResultsContent>

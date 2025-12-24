@@ -15,8 +15,8 @@ const ScreenshotCard = (props: { data: { image?: string, data?: string, }, title
   const screenshot = props.data;
   return (
     <Card heading={props.title} actionButtons={props.actionButtons} styles={cardStyles}>
-      { screenshot.image && <img src={`data:image/png;base64,${screenshot.image}`}  alt="Full page screenshot" /> }
-      { (!screenshot.image && screenshot.data) && <img src={screenshot.data} alt="Full page screenshot" /> }
+      {screenshot.image && <img src={`data:image/png;base64,${screenshot.image}`} alt="Full page screenshot" />}
+      {(!screenshot.image && screenshot.data) && <img src={screenshot.data} alt="Full page screenshot" />}
     </Card>
   );
 }

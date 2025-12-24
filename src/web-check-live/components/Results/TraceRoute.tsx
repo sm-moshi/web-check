@@ -38,19 +38,19 @@ const TraceRouteCard = (props: { data: any, title: string, actionButtons: any })
   return (
     <Card heading={props.title} actionButtons={props.actionButtons} styles={cardStyles}>
       {routes.filter((x: any) => x).map((route: any, index: number) => (
-          <RouteRow key={index}>
-            <span className="ipName">{Object.keys(route)[0]}</span>
-            <RouteTimings>
-              {route[Object.keys(route)[0]].map((time: any, packetIndex: number) => (
-                <p className="times" key={`timing-${packetIndex}-${time}`}>
-                  { route[Object.keys(route)[0]].length > 1 && (<>Packet #{packetIndex + 1}:</>) }
-                  Took {time} ms
-                </p>
-              ))}
-              <p className="arrow">↓</p>
-            </RouteTimings>
-          </RouteRow>
-        )
+        <RouteRow key={index}>
+          <span className="ipName">{Object.keys(route)[0]}</span>
+          <RouteTimings>
+            {route[Object.keys(route)[0]].map((time: any, packetIndex: number) => (
+              <p className="times" key={`timing-${packetIndex}-${time}`}>
+                {route[Object.keys(route)[0]].length > 1 && (<>Packet #{packetIndex + 1}:</>)}
+                Took {time} ms
+              </p>
+            ))}
+            <p className="arrow">↓</p>
+          </RouteTimings>
+        </RouteRow>
+      )
       )}
       <RouteTimings>
         <p className="completed">

@@ -2,10 +2,9 @@ import puppeteer from 'puppeteer-core';
 import chromium from '@sparticuz/chromium';
 import middleware from './_common/middleware.js';
 import { execFile } from 'child_process';
-import { promises as fs } from 'fs';
+import { promises as fs, constants as fsConstants } from 'fs';
 import path from 'path';
-import pkg from 'uuid';
-const { v4: uuidv4 } = pkg;
+import { v4 as uuidv4 } from 'uuid';
 
 // Helper function for direct chromium screenshot as fallback
 const directChromiumScreenshot = async (url, chromePath) => {
@@ -60,11 +59,40 @@ const resolveChromePath = async () => {
   if (process.env.CHROME_PATH) {
     return process.env.CHROME_PATH;
   }
-  const executablePath = await chromium.executablePath();
-  if (!executablePath) {
-    throw new Error('Chromium executable path not found');
+
+  if (process.platform === 'linux') {
+    const executablePath = await chromium.executablePath();
+    if (!executablePath) {
+      throw new Error('Chromium executable path not found');
+    }
+    return executablePath;
   }
-  return executablePath;
+
+  const candidates = [];
+  if (process.platform === 'darwin') {
+    candidates.push(
+      '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+      '/Applications/Chromium.app/Contents/MacOS/Chromium',
+      '/Applications/Brave Browser.app/Contents/MacOS/Brave Browser'
+    );
+  }
+  if (process.platform === 'win32') {
+    candidates.push(
+      'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
+      'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe'
+    );
+  }
+
+  for (const candidate of candidates) {
+    try {
+      await fs.access(candidate, fsConstants.X_OK);
+      return candidate;
+    } catch {
+      // Try next candidate
+    }
+  }
+
+  throw new Error('Chromium executable path not found');
 };
 
 const screenshotHandler = async (targetUrl) => {
