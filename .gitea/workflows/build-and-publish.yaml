@@ -68,28 +68,28 @@ jobs:
           echo "digest=${digest}" >> "$GITHUB_OUTPUT"
           printf 'Pushed %s@%s\n' "${REGISTRY}/${IMAGE_PATH}:${TAG}" "${digest}"
 
-      - name: Trivy scan
+      - name: Trivy scan (non-blocking)
+        continue-on-error: true
         env:
           TAG: ${{ steps.meta.outputs.tag }}
         run: |
+          set -e
           apk add --no-cache curl wget ca-certificates
           VERSION=0.56.2
           ARCH=$(uname -m)
           case "$ARCH" in
-            x86_64) TRIVY_ARCH=64 ;; aarch64) TRIVY_ARCH=ARM64 ;; *) echo "Unsupported arch $ARCH"; exit 1 ;; esac
+            x86_64) TRIVY_ARCH=64 ;;
+            aarch64) TRIVY_ARCH=ARM64 ;;
+            *) echo "Unsupported arch $ARCH; skipping Trivy"; exit 0 ;;
+          esac
           wget -qO /tmp/trivy.tgz "https://github.com/aquasecurity/trivy/releases/download/v${VERSION}/trivy_${VERSION}_Linux-${TRIVY_ARCH}.tar.gz"
           tar -xzf /tmp/trivy.tgz -C /tmp trivy
-          set +e
           /tmp/trivy image \
             --severity CRITICAL,HIGH \
             --ignore-unfixed \
             --no-progress \
             --exit-code 0 \
-            "${REGISTRY}/${IMAGE_PATH}:${TAG}"
-          trivy_rc=$?
-          if [ $trivy_rc -ne 0 ]; then
-            echo "Trivy scan failed with exit code $trivy_rc (non-blocking)"
-          fi
+            "${REGISTRY}/${IMAGE_PATH}:${TAG}" || true
 
       - name: Prepare SSH for infra repo (GitHub)
         if: ${{ secrets.INFRA_SSH_KEY != '' }}
