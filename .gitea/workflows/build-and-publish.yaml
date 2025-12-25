@@ -54,7 +54,7 @@ jobs:
           BUILDKIT_PROGRESS: plain
         run: |
           docker buildx build \
-            --platform linux/amd64,linux/arm64 \
+            --platform linux/amd64 \
             -t "${REGISTRY}/${IMAGE_PATH}:${TAG}" \
             --push \
             .
