@@ -2,6 +2,7 @@
 	"name": "web-check",
 	"type": "module",
 	"version": "2.0.2-r31",
+	"packageManager": "yarn@4.5.3",
 	"homepage": "https://github.com/sm-moshi/web-check",
 	"scripts": {
 		"postinstall": "node scripts/postinstall.cjs",

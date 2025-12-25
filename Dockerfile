@@ -16,8 +16,9 @@ RUN apt-get update \
     python3 make g++ git ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-# Yarn via Corepack (repo currently ends up using yarn classic)
-RUN corepack enable
+# Yarn via Corepack (lockfile uses Yarn Berry)
+RUN corepack enable \
+    && corepack prepare yarn@4.5.3 --activate
 
 # IMPORTANT for multi-arch: prevent puppeteer from downloading chromium during install
 ENV PUPPETEER_SKIP_DOWNLOAD=1 \
@@ -26,7 +27,7 @@ ENV PUPPETEER_SKIP_DOWNLOAD=1 \
 # deps first (cache)
 COPY package.json yarn.lock .yarnrc.yml ./
 COPY scripts ./scripts
-RUN yarn install
+RUN yarn install --immutable
 
 # build
 COPY . .
@@ -53,19 +54,11 @@ RUN apt-get update \
     chromium fonts-liberation fontconfig \
     && rm -rf /var/lib/apt/lists/* /usr/share/doc /usr/share/man /usr/share/locale
 
-# Yarn via Corepack
-RUN corepack enable
-
 # create unprivileged user
 RUN useradd --create-home --uid 10001 --shell /usr/sbin/nologin webcheck
 
-# install ONLY production deps (no dev deps)
-COPY package.json yarn.lock .yarnrc.yml ./
-RUN YARN_IGNORE_SCRIPTS=1 yarn install --frozen-lockfile --production=true \
-    && (yarn cache clean --all || true) \
-    && rm -rf node_modules/esbuild node_modules/@esbuild
-
-# copy only runtime artifacts
+# copy only runtime artifacts (node_modules built for target arch in build stage)
+COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/dist ./dist
 COPY --from=build /app/public ./public
 COPY --from=build /app/api ./api
@@ -75,4 +68,4 @@ USER webcheck
 EXPOSE 3000
 
 ENTRYPOINT ["dumb-init", "--"]
-CMD ["yarn", "start"]
+CMD ["node", "server.js"]

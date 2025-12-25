@@ -1,0 +1,141 @@
+name: web-check-build-push
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch: {}
+
+env:
+  REGISTRY: harbor.m0sh1.cc
+  IMAGE_PATH: apps/web-check
+  INFRA_REPO: git@github.com:sm-moshi/m0sh1.cc-infra.git
+  INFRA_BASE_BRANCH: main
+
+jobs:
+  build-push-pr:
+    runs-on: [self-hosted, alpine]
+    steps:
+      - name: Checkout web-check
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install tooling (apk)
+        run: |
+          apk add --no-cache git openssh-client curl jq python3 py3-pyyaml
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Harbor
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ secrets.HARBOR_ROBOT_USERNAME }}
+          password: ${{ secrets.HARBOR_ROBOT_PASSWORD }}
+
+      - name: Compute image tag
+        id: meta
+        run: |
+          pkg_ver="$(jq -r '.version' package.json)"
+          short_sha="$(echo "${GITHUB_SHA}" | cut -c1-7)"
+          tag="v${pkg_ver}-g${short_sha}"
+          echo "tag=${tag}" >> "$GITHUB_OUTPUT"
+          echo "image=${REGISTRY}/${IMAGE_PATH}:${tag}" >> "$GITHUB_OUTPUT"
+
+      - name: Build and push (multi-arch)
+        env:
+          TAG: ${{ steps.meta.outputs.tag }}
+        run: |
+          docker buildx build \
+            --platform linux/amd64,linux/arm64 \
+            -t "${REGISTRY}/${IMAGE_PATH}:${TAG}" \
+            --push \
+            .
+
+      - name: Fetch digest
+        id: digest
+        env:
+          TAG: ${{ steps.meta.outputs.tag }}
+        run: |
+          digest="$(docker buildx imagetools inspect "${REGISTRY}/${IMAGE_PATH}:${TAG}" | awk '/Digest:/ {print $2; exit}')"
+          echo "digest=${digest}" >> "$GITHUB_OUTPUT"
+          printf 'Pushed %s@%s\n' "${REGISTRY}/${IMAGE_PATH}:${TAG}" "${digest}"
+
+      - name: Trivy scan
+        env:
+          TAG: ${{ steps.meta.outputs.tag }}
+        run: |
+          apk add --no-cache trivy
+          trivy image --severity CRITICAL,HIGH --ignore-unfixed --exit-code 1 "${REGISTRY}/${IMAGE_PATH}:${TAG}"
+
+      - name: Prepare SSH for infra repo (GitHub)
+        if: ${{ secrets.INFRA_SSH_KEY != '' }}
+        env:
+          SSH_KEY: ${{ secrets.INFRA_SSH_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "${SSH_KEY}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan github.com >> ~/.ssh/known_hosts
+
+      - name: Clone infra repo
+        run: |
+          git clone --depth 1 "${INFRA_REPO}" /tmp/infra
+
+      - name: Bump image tag in infra
+        env:
+          TAG: ${{ steps.meta.outputs.tag }}
+          DIGEST: ${{ steps.digest.outputs.digest }}
+        run: |
+          cd /tmp/infra
+          ./tooling/scripts/bump_web_check_image.sh "${TAG}" "${DIGEST}"
+
+      - name: Commit changes
+        env:
+          TAG: ${{ steps.meta.outputs.tag }}
+        run: |
+          cd /tmp/infra
+          git config user.name "web-check-bot"
+          git config user.email "web-check-bot@gitea"
+          git add apps/user/web-check/helm/values.yaml apps/user/web-check/helm/Chart.yaml
+          if git diff --cached --quiet; then
+            echo "No changes to commit (tag may already be set)."
+            exit 0
+          fi
+          git commit -m "chore(web-check): bump image to ${TAG}"
+
+      - name: Push branch
+        env:
+          TAG: ${{ steps.meta.outputs.tag }}
+        run: |
+          cd /tmp/infra
+          branch="chore/web-check-${TAG}"
+          git push origin "HEAD:${branch}"
+          echo "BRANCH=${branch}" >> "$GITHUB_ENV"
+
+      - name: Open PR in infra (GitHub API)
+        if: ${{ secrets.INFRA_GITHUB_TOKEN != '' }}
+        env:
+          TAG: ${{ steps.meta.outputs.tag }}
+          DIGEST: ${{ steps.digest.outputs.digest }}
+          BRANCH: ${{ env.BRANCH }}
+        run: |
+          api="https://api.github.com/repos/sm-moshi/m0sh1.cc-infra/pulls"
+          body=$(cat <<EOF
+          {
+            "title": "chore(web-check): ${TAG}",
+            "head": "${BRANCH}",
+            "base": "${INFRA_BASE_BRANCH}",
+            "body": "Auto-bump web-check image to ${TAG}\\n\\nDigest: ${DIGEST}"
+          }
+          EOF
+          )
+          curl -fsSL -X POST \
+            -H "Authorization: token ${INFRA_GITHUB_TOKEN}" \
+            -H "Content-Type: application/json" \
+            -d "${body}" \
+            "${api}"
