@@ -22,7 +22,7 @@ jobs:
 
       - name: Install tooling (apk)
         run: |
-          apk add --no-cache git openssh-client curl jq python3 py3-pyyaml
+          apk add --no-cache git openssh-client curl jq python3 py3-yaml
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
