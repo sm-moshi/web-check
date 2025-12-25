@@ -20,7 +20,22 @@ span.val {
 `;
 
 const makeRankStats = (data: { date: string, rank: number }[]) => {
+  if (data.length === 0) {
+    return {
+      average: null,
+      percentageChange: null
+    };
+  }
+
   const average = Math.round(data.reduce((acc, cur) => acc + cur.rank, 0) / data.length);
+
+  if (data.length < 2) {
+    return {
+      average,
+      percentageChange: null
+    };
+  }
+
   const today = data[0].rank;
   const yesterday = data[1].rank;
   const percentageChange = ((today - yesterday) / yesterday) * 100;
@@ -37,6 +52,23 @@ const makeChartData = (data: { date: string, rank: number }[]) => {
       uv: d.rank
     };
   });
+};
+
+const normalizeRanks = (ranks: any[]) => {
+  return ranks
+    .map((entry) => {
+      const rankValue = typeof entry?.rank === 'number'
+        ? entry.rank
+        : Number.parseInt(entry?.rank, 10);
+      if (!Number.isFinite(rankValue)) {
+        return null;
+      }
+      return {
+        date: entry?.date || '',
+        rank: rankValue,
+      };
+    })
+    .filter((entry): entry is { date: string; rank: number } => Boolean(entry));
 };
 
 function Chart(chartData: { date: string; uv: number; }[], data: any) {
@@ -57,21 +89,31 @@ function Chart(chartData: { date: string; uv: number; }[], data: any) {
 }
 
 const RankCard = (props: { data: any, title: string, actionButtons: any }): JSX.Element => {
-  const data = props.data.ranks || [];
+  const rawRanks = Array.isArray(props.data.ranks) ? props.data.ranks : [];
+  const data = normalizeRanks(rawRanks);
   const { average, percentageChange } = makeRankStats(data);
   const chartData = makeChartData(data);
+  const latestRank = data[0]?.rank;
+  const skippedMessage = props.data.skipped;
   return (
     <Card heading={props.title} actionButtons={props.actionButtons} styles={cardStyles}>
-      <div className="rank-average">{data[0].rank.toLocaleString()}</div>
-      <Row lbl="Change since Yesterday" val={`${percentageChange > 0 ? '+' : ''} ${percentageChange.toFixed(2)}%`} />
-      <Row lbl="Historical Average Rank" val={average.toLocaleString()} />
-      <div className="chart-container">
-        {Chart(chartData, data)}
-      </div>
+      <div className="rank-average">{latestRank ? latestRank.toLocaleString() : 'No ranking data'}</div>
+      {skippedMessage && (<p>{skippedMessage}</p>)}
+      <Row
+        lbl="Change since Yesterday"
+        val={percentageChange === null ? 'N/A' : `${percentageChange > 0 ? '+' : ''} ${percentageChange.toFixed(2)}%`}
+      />
+      <Row
+        lbl="Historical Average Rank"
+        val={average === null ? 'N/A' : average.toLocaleString()}
+      />
+      {data.length > 0 && (
+        <div className="chart-container">
+          {Chart(chartData, data)}
+        </div>
+      )}
     </Card>
   );
 }
 
 export default RankCard;
-
-
