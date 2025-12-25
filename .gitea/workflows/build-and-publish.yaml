@@ -135,26 +135,25 @@ jobs:
           branch="chore/web-check-${TAG}"
           git push origin "HEAD:${branch}"
           echo "BRANCH=${branch}" >> "$GITHUB_ENV"
-
-      - name: Open PR in infra (GitHub API)
-        if: ${{ secrets.INFRA_GITHUB_TOKEN != '' }}
-        env:
-          TAG: ${{ steps.meta.outputs.tag }}
-          DIGEST: ${{ steps.digest.outputs.digest }}
-          BRANCH: ${{ env.BRANCH }}
-        run: |
-          api="https://api.github.com/repos/sm-moshi/m0sh1.cc-infra/pulls"
-          body=$(cat <<EOF
-          {
-            "title": "chore(web-check): ${TAG}",
-            "head": "${BRANCH}",
-            "base": "${INFRA_BASE_BRANCH}",
-            "body": "Auto-bump web-check image to ${TAG}\\n\\nDigest: ${DIGEST}"
-          }
-          EOF
-          )
-          curl -fsSL -X POST \
-            -H "Authorization: token ${INFRA_GITHUB_TOKEN}" \
-            -H "Content-Type: application/json" \
-            -d "${body}" \
-            "${api}"
+      # - name: Open PR in infra (GitHub API)
+      #   if: ${{ secrets.INFRA_GITHUB_TOKEN != '' }}
+      #   env:
+      #     TAG: ${{ steps.meta.outputs.tag }}
+      #     DIGEST: ${{ steps.digest.outputs.digest }}
+      #     BRANCH: ${{ env.BRANCH }}
+      #   run: |
+      #     api="https://api.github.com/repos/sm-moshi/m0sh1.cc-infra/pulls"
+      #     body=$(cat <<EOF
+      #     {
+      #       "title": "chore(web-check): ${TAG}",
+      #       "head": "${BRANCH}",
+      #       "base": "${INFRA_BASE_BRANCH}",
+      #       "body": "Auto-bump web-check image to ${TAG}\\n\\nDigest: ${DIGEST}"
+      #     }
+      #     EOF
+      #     )
+      #     curl -fsSL -X POST \
+      #       -H "Authorization: token ${INFRA_GITHUB_TOKEN}" \
+      #       -H "Content-Type: application/json" \
+      #       -d "${body}" \
+      #       "${api}"
