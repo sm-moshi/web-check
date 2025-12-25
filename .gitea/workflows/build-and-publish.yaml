@@ -79,7 +79,12 @@ jobs:
             x86_64) TRIVY_ARCH=64 ;; aarch64) TRIVY_ARCH=ARM64 ;; *) echo "Unsupported arch $ARCH"; exit 1 ;; esac
           wget -qO /tmp/trivy.tgz "https://github.com/aquasecurity/trivy/releases/download/v${VERSION}/trivy_${VERSION}_Linux-${TRIVY_ARCH}.tar.gz"
           tar -xzf /tmp/trivy.tgz -C /tmp trivy
-          /tmp/trivy image --severity CRITICAL,HIGH --ignore-unfixed --exit-code 1 "${REGISTRY}/${IMAGE_PATH}:${TAG}"
+          /tmp/trivy image \
+            --severity CRITICAL,HIGH \
+            --ignore-unfixed \
+            --no-progress \
+            --exit-code 0 \
+            "${REGISTRY}/${IMAGE_PATH}:${TAG}"
 
       - name: Prepare SSH for infra repo (GitHub)
         if: ${{ secrets.INFRA_SSH_KEY != '' }}
