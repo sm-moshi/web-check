@@ -20,6 +20,9 @@ RUN apt-get update \
 RUN corepack enable \
     && corepack prepare yarn@4.5.3 --activate
 
+ENV YARN_ENABLE_PROGRESS_BARS=0 \
+    YARN_LOG_LEVEL=warn
+
 # IMPORTANT for multi-arch: prevent puppeteer from downloading chromium during install
 ENV PUPPETEER_SKIP_DOWNLOAD=1 \
     PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=1
@@ -27,7 +30,7 @@ ENV PUPPETEER_SKIP_DOWNLOAD=1 \
 # deps first (cache)
 COPY package.json yarn.lock .yarnrc.yml ./
 COPY scripts ./scripts
-RUN yarn install --immutable
+RUN yarn install --immutable --silent
 
 # build
 COPY . .
