@@ -51,7 +51,7 @@ jobs:
       - name: Build and push (multi-arch)
         env:
           TAG: ${{ steps.meta.outputs.tag }}
-          BUILDKIT_PROGRESS: auto
+          BUILDKIT_PROGRESS: quiet
         run: |
           docker buildx build \
             --platform linux/amd64,linux/arm64 \

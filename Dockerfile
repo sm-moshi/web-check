@@ -29,7 +29,7 @@ ENV PUPPETEER_SKIP_DOWNLOAD=1 \
 # deps first (cache)
 COPY package.json yarn.lock .yarnrc.yml ./
 COPY scripts ./scripts
-RUN yarn install --immutable --silent
+RUN yarn install --immutable --inline-builds --silent
 
 # build
 COPY . .
