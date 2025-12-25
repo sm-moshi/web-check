@@ -20,8 +20,7 @@ RUN apt-get update \
 RUN corepack enable \
     && corepack prepare yarn@4.5.3 --activate
 
-ENV YARN_ENABLE_PROGRESS_BARS=0 \
-    YARN_LOG_LEVEL=warn
+ENV YARN_ENABLE_PROGRESS_BARS=0
 
 # IMPORTANT for multi-arch: prevent puppeteer from downloading chromium during install
 ENV PUPPETEER_SKIP_DOWNLOAD=1 \
