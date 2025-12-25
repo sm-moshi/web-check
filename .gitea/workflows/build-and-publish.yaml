@@ -24,6 +24,11 @@ jobs:
         run: |
           apk add --no-cache git openssh-client curl jq python3 py3-yaml
 
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+        with:
+          image: harbor.m0sh1.cc/apps/tonistiigi-binfmt:latest
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -48,7 +53,7 @@ jobs:
           TAG: ${{ steps.meta.outputs.tag }}
         run: |
           docker buildx build \
-            --platform linux/amd64 \
+            --platform linux/amd64,linux/arm64 \
             -t "${REGISTRY}/${IMAGE_PATH}:${TAG}" \
             --push \
             .
