@@ -103,6 +103,7 @@ jobs:
 
       - name: Clone infra repo
         run: |
+          rm -rf /tmp/infra
           git clone --depth 1 "${INFRA_REPO}" /tmp/infra
 
       - name: Bump image tag in infra
