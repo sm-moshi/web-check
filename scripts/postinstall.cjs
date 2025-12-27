@@ -27,7 +27,7 @@ try {
 	}
 
 	// Check if the package already has the fix
-	if (packageJson.exports["."] && packageJson.exports["."].import) {
+	if (packageJson.exports?.["."]?.import) {
 		console.log("✓ @fortawesome/svelte-fontawesome already patched");
 		process.exit(0);
 	}

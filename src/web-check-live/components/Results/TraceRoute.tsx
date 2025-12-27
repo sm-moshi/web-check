@@ -1,6 +1,6 @@
-import styled from '@emotion/styled';
-import colors from 'web-check-live/styles/colors';
-import { Card } from 'web-check-live/components/Form/Card';
+import styled from "@emotion/styled";
+import colors from "web-check-live/styles/colors";
+import { Card } from "web-check-live/components/Form/Card";
 
 const RouteRow = styled.div`
   text-align: center;
@@ -32,33 +32,46 @@ p {
 
 const cardStyles = ``;
 
-const TraceRouteCard = (props: { data: any, title: string, actionButtons: any }): JSX.Element => {
-  const traceRouteResponse = props.data;
-  const routes = traceRouteResponse.result;
-  return (
-    <Card heading={props.title} actionButtons={props.actionButtons} styles={cardStyles}>
-      {routes.filter((x: any) => x).map((route: any, index: number) => (
-        <RouteRow key={index}>
-          <span className="ipName">{Object.keys(route)[0]}</span>
-          <RouteTimings>
-            {route[Object.keys(route)[0]].map((time: any, packetIndex: number) => (
-              <p className="times" key={`timing-${packetIndex}-${time}`}>
-                {route[Object.keys(route)[0]].length > 1 && (<>Packet #{packetIndex + 1}:</>)}
-                Took {time} ms
-              </p>
-            ))}
-            <p className="arrow">↓</p>
-          </RouteTimings>
-        </RouteRow>
-      )
-      )}
-      <RouteTimings>
-        <p className="completed">
-          Round trip completed in {traceRouteResponse.timeTaken} ms
-        </p>
-      </RouteTimings>
-    </Card>
-  );
-}
+const TraceRouteCard = (props: {
+	data: any;
+	title: string;
+	actionButtons: any;
+}): JSX.Element => {
+	const traceRouteResponse = props.data;
+	const routes = traceRouteResponse.result;
+	return (
+		<Card
+			heading={props.title}
+			actionButtons={props.actionButtons}
+			styles={cardStyles}
+		>
+			{routes
+				.filter((x: any) => x)
+				.map((route: any, index: number) => (
+					<RouteRow key={index}>
+						<span className="ipName">{Object.keys(route)[0]}</span>
+						<RouteTimings>
+							{route[Object.keys(route)[0]].map(
+								(time: any, packetIndex: number) => (
+									<p className="times" key={`timing-${packetIndex}-${time}`}>
+										{route[Object.keys(route)[0]].length > 1 && (
+											<>Packet #{packetIndex + 1}:</>
+										)}
+										Took {time} ms
+									</p>
+								),
+							)}
+							<p className="arrow">↓</p>
+						</RouteTimings>
+					</RouteRow>
+				))}
+			<RouteTimings>
+				<p className="completed">
+					Round trip completed in {traceRouteResponse.timeTaken} ms
+				</p>
+			</RouteTimings>
+		</Card>
+	);
+};
 
 export default TraceRouteCard;

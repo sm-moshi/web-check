@@ -1,6 +1,6 @@
-import colors from 'web-check-live/styles/colors';
-import { Card } from 'web-check-live/components/Form/Card';
-import Row from 'web-check-live/components/Form/Row';
+import colors from "web-check-live/styles/colors";
+import { Card } from "web-check-live/components/Form/Card";
+import Row from "web-check-live/components/Form/Row";
 
 const cardStyles = `
   div {
@@ -19,24 +19,32 @@ const cardStyles = `
   }
 `;
 
-const RedirectsCard = (props: { data: any, title: string, actionButtons: any }): JSX.Element => {
-  const redirects = props.data;
-  return (
-    <Card heading={props.title} actionButtons={props.actionButtons} styles={cardStyles}>
-      {!redirects?.redirects.length && <Row lbl="" val="No redirects" />}
-      <p className="redirect-count">
-        Followed {redirects.redirects.length}{' '}
-        redirect{redirects.redirects.length === 1 ? '' : 's'} when contacting host
-      </p>
-      {redirects.redirects.map((redirect: any, index: number) => {
-        return (
-          <Row lbl="" val="" key={index}>
-            <span className="arrow-thing">↳</span> {redirect}
-          </Row>
-        );
-      })}
-    </Card>
-  );
-}
+const RedirectsCard = (props: {
+	data: any;
+	title: string;
+	actionButtons: any;
+}): JSX.Element => {
+	const redirects = props.data;
+	return (
+		<Card
+			heading={props.title}
+			actionButtons={props.actionButtons}
+			styles={cardStyles}
+		>
+			{!redirects?.redirects.length && <Row lbl="" val="No redirects" />}
+			<p className="redirect-count">
+				Followed {redirects.redirects.length} redirect
+				{redirects.redirects.length === 1 ? "" : "s"} when contacting host
+			</p>
+			{redirects.redirects.map((redirect: any, index: number) => {
+				return (
+					<Row lbl="" val="" key={index}>
+						<span className="arrow-thing">↳</span> {redirect}
+					</Row>
+				);
+			})}
+		</Card>
+	);
+};
 
 export default RedirectsCard;

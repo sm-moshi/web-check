@@ -1,43 +1,48 @@
-import tls from 'tls';
-import middleware from './_common/middleware.js';
+import tls from "node:tls";
+import middleware from "./_common/middleware.js";
 
 const sslHandler = async (urlString) => {
-  try {
-    const parsedUrl = new URL(urlString);
-    const options = {
-      host: parsedUrl.hostname,
-      port: parsedUrl.port || 443,
-      servername: parsedUrl.hostname,
-      rejectUnauthorized: true,
-    };
+	try {
+		const parsedUrl = new URL(urlString);
+		const options = {
+			host: parsedUrl.hostname,
+			port: parsedUrl.port || 443,
+			servername: parsedUrl.hostname,
+			rejectUnauthorized: true,
+		};
 
-    return new Promise((resolve, reject) => {
-      const socket = tls.connect(options, () => {
-        if (!socket.authorized) {
-          return reject(new Error(`SSL handshake not authorized. Reason: ${socket.authorizationError}`));
-        }
+		return new Promise((resolve, reject) => {
+			const socket = tls.connect(options, () => {
+				if (!socket.authorized) {
+					return reject(
+						new Error(
+							`SSL handshake not authorized. Reason: ${socket.authorizationError}`,
+						),
+					);
+				}
 
-        const cert = socket.getPeerCertificate();
-        if (!cert || Object.keys(cert).length === 0) {
-          return reject(new Error(`
+				const cert = socket.getPeerCertificate();
+				if (!cert || Object.keys(cert).length === 0) {
+					return reject(
+						new Error(`
           No certificate presented by the server.\n
           The server is possibly not using SNI (Server Name Indication) to identify itself, and you are connecting to a hostname-aliased IP address.
-          Or it may be due to an invalid SSL certificate, or an incomplete SSL handshake at the time the cert is being read.`));
-        }
+          Or it may be due to an invalid SSL certificate, or an incomplete SSL handshake at the time the cert is being read.`),
+					);
+				}
 
-        const { raw, issuerCertificate, ...certWithoutRaw } = cert;
-        resolve(certWithoutRaw);
-        socket.end();
-      });
+				const { raw, issuerCertificate, ...certWithoutRaw } = cert;
+				resolve(certWithoutRaw);
+				socket.end();
+			});
 
-      socket.on('error', (error) => {
-        reject(new Error(`Error fetching site certificate: ${error.message}`));
-      });
-    });
-
-  } catch (error) {
-    throw new Error(error.message);
-  }
+			socket.on("error", (error) => {
+				reject(new Error(`Error fetching site certificate: ${error.message}`));
+			});
+		});
+	} catch (error) {
+		throw new Error(error.message);
+	}
 };
 
 export const handler = middleware(sslHandler);

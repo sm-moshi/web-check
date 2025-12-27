@@ -1,17 +1,16 @@
 ---
-import Icon from '@components/molecules/Icon.svelte';
+import Icon from "@components/molecules/Icon.svelte";
 
 interface Props {
-  links: {
-    title: string;
-    url: string;
-    icon: string;
-    isCta: boolean;
-  }[];
+	links: {
+		title: string;
+		url: string;
+		icon: string;
+		isCta: boolean;
+	}[];
 }
 
 const { links } = Astro.props;
-
 ---
 
 <div class="button-wrap">

@@ -1,12 +1,11 @@
+import styled from "@emotion/styled";
 
-import styled from '@emotion/styled';
-
-import colors from 'web-check-live/styles/colors';
-import Heading from 'web-check-live/components/Form/Heading';
-import Footer from 'web-check-live/components/misc/Footer';
-import Nav from 'web-check-live/components/Form/Nav';
-import Button from 'web-check-live/components/Form/Button';
-import { StyledCard } from 'web-check-live/components/Form/Card';
+import colors from "web-check-live/styles/colors";
+import Heading from "web-check-live/components/Form/Heading";
+import Footer from "web-check-live/components/misc/Footer";
+import Nav from "web-check-live/components/Form/Nav";
+import Button from "web-check-live/components/Form/Button";
+import { StyledCard } from "web-check-live/components/Form/Card";
 
 const AboutContainer = styled.div`
   width: 95vw;
@@ -44,25 +43,36 @@ const NotFoundInner = styled(StyledCard)`
   h2 { font-size: 8rem; }
 `;
 
-
 const NotFound = (): JSX.Element => {
-  return (
-    <>
-      <AboutContainer>
-        <Nav />
-        <NotFoundInner>
-          <Heading as="h2" size="large" color={colors.primary}>404</Heading>
-          <span className="im-drink">🥴</span>
-          <Heading as="h3" size="large" color={colors.primary}>Not Found</Heading>
-          <HeaderLinkContainer>
-            <a href="/"><Button>Back to Homepage</Button></a>
-          </HeaderLinkContainer>
-          <a target="_blank" rel="noreferrer" href="https://github.com/lissy93/web-check (& https://github.com/sm-moshi/web-check)">Report Issue</a>
-        </NotFoundInner>
-      </AboutContainer>
-      <Footer isFixed={true} />
-    </>
-  );
+	return (
+		<>
+			<AboutContainer>
+				<Nav />
+				<NotFoundInner>
+					<Heading as="h2" size="large" color={colors.primary}>
+						404
+					</Heading>
+					<span className="im-drink">🥴</span>
+					<Heading as="h3" size="large" color={colors.primary}>
+						Not Found
+					</Heading>
+					<HeaderLinkContainer>
+						<a href="/">
+							<Button>Back to Homepage</Button>
+						</a>
+					</HeaderLinkContainer>
+					<a
+						target="_blank"
+						rel="noreferrer"
+						href="https://github.com/lissy93/web-check (& https://github.com/sm-moshi/web-check)"
+					>
+						Report Issue
+					</a>
+				</NotFoundInner>
+			</AboutContainer>
+			<Footer isFixed={true} />
+		</>
+	);
 };
 
 export default NotFound;

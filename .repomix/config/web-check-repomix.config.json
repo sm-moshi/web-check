@@ -1,34 +1,31 @@
 {
-  "output": {
-    "filePath": "/Users/smeya/git/m0sh1.cc/web-check/",
-    "style": "markdown",
-    "parsableStyle": true,
-    "headerText": "",
-    "instructionFilePath": "",
-    "fileSummary": false,
-    "directoryStructure": true,
-    "removeComments": false,
-    "removeEmptyLines": true,
-    "topFilesLength": 5,
-    "showLineNumbers": false,
-    "copyToClipboard": true,
-    "includeEmptyDirectories": true,
-    "compress": true
-  },
-  "include": [],
-  "ignore": {
-    "useGitignore": true,
-    "useDefaultPatterns": true,
-    "customPatterns": [
-      "assets/fonts/**",
-      "assets/images/**"
-    ]
-  },
-  "security": {
-    "enableSecurityCheck": true
-  },
-  "tokenCount": {
-    "encoding": "o200k_base"
-  },
-  "cwd": "/Users/smeya/git/m0sh1.cc/web-check"
+	"output": {
+		"filePath": "/Users/smeya/git/m0sh1.cc/web-check/",
+		"style": "markdown",
+		"parsableStyle": true,
+		"headerText": "",
+		"instructionFilePath": "",
+		"fileSummary": false,
+		"directoryStructure": true,
+		"removeComments": false,
+		"removeEmptyLines": true,
+		"topFilesLength": 5,
+		"showLineNumbers": false,
+		"copyToClipboard": true,
+		"includeEmptyDirectories": true,
+		"compress": true
+	},
+	"include": [],
+	"ignore": {
+		"useGitignore": true,
+		"useDefaultPatterns": true,
+		"customPatterns": ["assets/fonts/**", "assets/images/**"]
+	},
+	"security": {
+		"enableSecurityCheck": true
+	},
+	"tokenCount": {
+		"encoding": "o200k_base"
+	},
+	"cwd": "/Users/smeya/git/m0sh1.cc/web-check"
 }

@@ -1,114 +1,129 @@
-import { promises as dns } from 'dns';
-import URL from 'url-parse';
-import middleware from './_common/middleware.js';
+import { promises as dns } from "node:dns";
+import URL from "url-parse";
+import middleware from "./_common/middleware.js";
 
 // Helper to more safely detect Bluehost-related TXT records without naive substring matching.
 const isBluehostTxtRecord = (recordString) => {
-  // Quick check to avoid unnecessary work when Bluehost is not mentioned at all.
-  if (!recordString || !recordString.includes('bluehost.com')) {
-    return false;
-  }
+	// Quick check to avoid unnecessary work when Bluehost is not mentioned at all.
+	if (!recordString || !recordString.includes("bluehost.com")) {
+		return false;
+	}
 
-  // Split into tokens (e.g. SPF mechanisms) and look for include:/redirect= entries
-  // that explicitly reference bluehost.com as the domain.
-  const tokens = recordString.split(/\s+/);
-  for (const token of tokens) {
-    if (token.startsWith('include:')) {
-      const domain = token.slice('include:'.length).toLowerCase();
-      if (domain === 'bluehost.com') {
-        return true;
-      }
-    } else if (token.startsWith('redirect=')) {
-      const domain = token.slice('redirect='.length).toLowerCase();
-      if (domain === 'bluehost.com') {
-        return true;
-      }
-    }
-  }
+	// Split into tokens (e.g. SPF mechanisms) and look for include:/redirect= entries
+	// that explicitly reference bluehost.com as the domain.
+	const tokens = recordString.split(/\s+/);
+	for (const token of tokens) {
+		if (token.startsWith("include:")) {
+			const domain = token.slice("include:".length).toLowerCase();
+			if (domain === "bluehost.com") {
+				return true;
+			}
+		} else if (token.startsWith("redirect=")) {
+			const domain = token.slice("redirect=".length).toLowerCase();
+			if (domain === "bluehost.com") {
+				return true;
+			}
+		}
+	}
 
-  return false;
+	return false;
 };
 
 // Helper to safely detect Mimecast MX hosts without naive substring matching.
 // Accepts 'mimecast.com' and any subdomain that ends with '.mimecast.com'.
 const isMimecastHost = (hostname) => {
-  if (!hostname) return false;
-  const lower = hostname.toLowerCase();
-  return lower === 'mimecast.com' || lower.endsWith('.mimecast.com');
+	if (!hostname) return false;
+	const lower = hostname.toLowerCase();
+	return lower === "mimecast.com" || lower.endsWith(".mimecast.com");
 };
 
-const mailConfigHandler = async (url, event, context) => {
-  try {
-    const domain = new URL(url).hostname || new URL(url).pathname;
+const mailConfigHandler = async (url, _event, _context) => {
+	try {
+		const domain = new URL(url).hostname || new URL(url).pathname;
 
-    // Get MX records
-    const mxRecords = await dns.resolveMx(domain);
+		// Get MX records
+		const mxRecords = await dns.resolveMx(domain);
 
-    // Get TXT records
-    const txtRecords = await dns.resolveTxt(domain);
+		// Get TXT records
+		const txtRecords = await dns.resolveTxt(domain);
 
-    // Filter for only email related TXT records (SPF, DKIM, DMARC, and certain provider verifications)
-    const emailTxtRecords = txtRecords.filter(record => {
-      const recordString = record.join('');
-      return (
-        recordString.startsWith('v=spf1') ||
-        recordString.startsWith('v=DKIM1') ||
-        recordString.startsWith('v=DMARC1') ||
-        recordString.startsWith('protonmail-verification=') ||
-        recordString.startsWith('google-site-verification=') || // Google Workspace
-        recordString.startsWith('MS=') || // Microsoft 365
-        recordString.startsWith('zoho-verification=') || // Zoho
-        recordString.startsWith('titan-verification=') || // Titan
-        isBluehostTxtRecord(recordString) // BlueHost
-      );
-    });
+		// Filter for only email related TXT records (SPF, DKIM, DMARC, and certain provider verifications)
+		const emailTxtRecords = txtRecords.filter((record) => {
+			const recordString = record.join("");
+			return (
+				recordString.startsWith("v=spf1") ||
+				recordString.startsWith("v=DKIM1") ||
+				recordString.startsWith("v=DMARC1") ||
+				recordString.startsWith("protonmail-verification=") ||
+				recordString.startsWith("google-site-verification=") || // Google Workspace
+				recordString.startsWith("MS=") || // Microsoft 365
+				recordString.startsWith("zoho-verification=") || // Zoho
+				recordString.startsWith("titan-verification=") || // Titan
+				isBluehostTxtRecord(recordString) // BlueHost
+			);
+		});
 
-    // Identify specific mail services
-    const mailServices = emailTxtRecords.map(record => {
-      const recordString = record.join('');
-      if (recordString.startsWith('protonmail-verification=')) {
-        return { provider: 'ProtonMail', value: recordString.split('=')[1] };
-      } else if (recordString.startsWith('google-site-verification=')) {
-        return { provider: 'Google Workspace', value: recordString.split('=')[1] };
-      } else if (recordString.startsWith('MS=')) {
-        return { provider: 'Microsoft 365', value: recordString.split('=')[1] };
-      } else if (recordString.startsWith('zoho-verification=')) {
-        return { provider: 'Zoho', value: recordString.split('=')[1] };
-      } else if (recordString.startsWith('titan-verification=')) {
-        return { provider: 'Titan', value: recordString.split('=')[1] };
-      } else if (isBluehostTxtRecord(recordString)) {
-        return { provider: 'BlueHost', value: recordString };
-      } else {
-        return null;
-      }
-    }).filter(record => record !== null);
+		// Identify specific mail services
+		const mailServices = emailTxtRecords
+			.map((record) => {
+				const recordString = record.join("");
+				if (recordString.startsWith("protonmail-verification=")) {
+					return { provider: "ProtonMail", value: recordString.split("=")[1] };
+				} else if (recordString.startsWith("google-site-verification=")) {
+					return {
+						provider: "Google Workspace",
+						value: recordString.split("=")[1],
+					};
+				} else if (recordString.startsWith("MS=")) {
+					return {
+						provider: "Microsoft 365",
+						value: recordString.split("=")[1],
+					};
+				} else if (recordString.startsWith("zoho-verification=")) {
+					return { provider: "Zoho", value: recordString.split("=")[1] };
+				} else if (recordString.startsWith("titan-verification=")) {
+					return { provider: "Titan", value: recordString.split("=")[1] };
+				} else if (isBluehostTxtRecord(recordString)) {
+					return { provider: "BlueHost", value: recordString };
+				} else {
+					return null;
+				}
+			})
+			.filter((record) => record !== null);
 
-    // Check MX records for Yahoo
-    const yahooMx = mxRecords.filter(record => record.exchange.includes('yahoodns.net'));
-    if (yahooMx.length > 0) {
-      mailServices.push({ provider: 'Yahoo', value: yahooMx[0].exchange });
-    }
-    // Check MX records for Mimecast
-    const mimecastMx = mxRecords.filter(record => isMimecastHost(record.exchange));
-    if (mimecastMx.length > 0) {
-      mailServices.push({ provider: 'Mimecast', value: mimecastMx[0].exchange });
-    }
+		// Check MX records for Yahoo
+		const yahooMx = mxRecords.filter((record) =>
+			record.exchange.includes("yahoodns.net"),
+		);
+		if (yahooMx.length > 0) {
+			mailServices.push({ provider: "Yahoo", value: yahooMx[0].exchange });
+		}
+		// Check MX records for Mimecast
+		const mimecastMx = mxRecords.filter((record) =>
+			isMimecastHost(record.exchange),
+		);
+		if (mimecastMx.length > 0) {
+			mailServices.push({
+				provider: "Mimecast",
+				value: mimecastMx[0].exchange,
+			});
+		}
 
-    return {
-      mxRecords,
-      txtRecords: emailTxtRecords,
-      mailServices,
-    };
-  } catch (error) {
-    if (error.code === 'ENOTFOUND' || error.code === 'ENODATA') {
-      return { skipped: 'No mail server in use on this domain' };
-    } else {
-      return {
-        statusCode: 500,
-        body: { error: error.message },
-      };
-    }
-  }
+		return {
+			mxRecords,
+			txtRecords: emailTxtRecords,
+			mailServices,
+		};
+	} catch (error) {
+		if (error.code === "ENOTFOUND" || error.code === "ENODATA") {
+			return { skipped: "No mail server in use on this domain" };
+		} else {
+			return {
+				statusCode: 500,
+				body: { error: error.message },
+			};
+		}
+	}
 };
 
 export const handler = middleware(mailConfigHandler);

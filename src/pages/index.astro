@@ -1,24 +1,28 @@
 ---
-import BaseLayout from '@layouts/Base.astro';
-import HeroForm from '@components/homepage/HeroForm.astro';
-import TempDisabled from '@/components/homepage/TempDisabled.astro';
-import HomeBackground from '@/components/homepage/HomeBackground';
-import AboutSection from '@/components/homepage/AboutSection.astro';
-import Footer from '@components/scafold/Footer.astro';
+import BaseLayout from "@layouts/Base.astro";
+import HeroForm from "@components/homepage/HeroForm.astro";
+import TempDisabled from "@/components/homepage/TempDisabled.astro";
+import HomeBackground from "@/components/homepage/HomeBackground";
+import AboutSection from "@/components/homepage/AboutSection.astro";
+import Footer from "@components/scafold/Footer.astro";
 
 const isBossServer = import.meta.env.BOSS_SERVER === true;
 
 const disableEverything = import.meta.env.VITE_DISABLE_EVERYTHING === true;
 
-const encodeUrlForPath = (value: string): string => Buffer.from(value, 'utf8').toString('base64url');
+const encodeUrlForPath = (value: string): string =>
+	Buffer.from(value, "utf8").toString("base64url");
 
 // Redirect strait to /check or /check/:url if running as self-hosted instance
 if (!isBossServer) {
-  const searchUrl = new URLSearchParams(new URL(Astro.request.url).search).get('url');
-  const redirectUrl = searchUrl ? `/check/${encodeUrlForPath(searchUrl)}` : '/check';
-  Astro.redirect(redirectUrl);
+	const searchUrl = new URLSearchParams(new URL(Astro.request.url).search).get(
+		"url",
+	);
+	const redirectUrl = searchUrl
+		? `/check/${encodeUrlForPath(searchUrl)}`
+		: "/check";
+	Astro.redirect(redirectUrl);
 }
-
 ---
 
 <BaseLayout>

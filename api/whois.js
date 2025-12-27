@@ -1,5 +1,5 @@
-import axios from "axios";
 import net from "node:net";
+import axios from "axios";
 import psl from "psl";
 import middleware from "./_common/middleware.js";
 
@@ -10,7 +10,7 @@ const getBaseDomain = (url) => {
 	} else if (url.startsWith("https://")) {
 		protocol = "https://";
 	}
-	let noProtocolUrl = url.replace(protocol, "");
+	const noProtocolUrl = url.replace(protocol, "");
 	const parsed = psl.parse(noProtocolUrl);
 	return protocol + parsed.domain;
 };
@@ -29,7 +29,7 @@ const parseWhoisData = (data) => {
 		const index = line.indexOf(":");
 		if (index === -1) {
 			if (lastKey !== "") {
-				parsedData[lastKey] += " " + line.trim();
+				parsedData[lastKey] += ` ${line.trim()}`;
 			}
 			continue;
 		}
@@ -50,7 +50,7 @@ const fetchFromInternic = async (hostname) => {
 		const client = net.createConnection(
 			{ port: 43, host: "whois.internic.net" },
 			() => {
-				client.write(hostname + "\r\n");
+				client.write(`${hostname}\r\n`);
 			},
 		);
 
@@ -84,14 +84,15 @@ const fetchFromRdap = async (hostname) => {
 	}
 };
 
-const whoisHandler = async (url) => {
-	if (!url.startsWith("http://") && !url.startsWith("https://")) {
-		url = "http://" + url;
-	}
+const whoisHandler = async (rawUrl) => {
+	const normalizedUrl =
+		rawUrl.startsWith("http://") || rawUrl.startsWith("https://")
+			? rawUrl
+			: `http://${rawUrl}`;
 
 	let hostname;
 	try {
-		hostname = getBaseDomain(new URL(url).hostname);
+		hostname = getBaseDomain(new URL(normalizedUrl).hostname);
 	} catch (error) {
 		throw new Error(`Unable to parse URL: ${error}`);
 	}

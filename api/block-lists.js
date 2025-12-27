@@ -80,9 +80,9 @@ const isDomainBlocked = async (domain, serverIP) => {
 };
 
 const checkDomainAgainstDnsServers = async (domain) => {
-	let results = [];
+	const results = [];
 
-	for (let server of DNS_SERVERS) {
+	for (const server of DNS_SERVERS) {
 		const isBlocked = await isDomainBlocked(domain, server.ip);
 		results.push({
 			server: server.name,

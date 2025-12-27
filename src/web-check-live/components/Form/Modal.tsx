@@ -1,14 +1,14 @@
-import React from 'react';
-import type { ReactNode } from 'react';
-import { createPortal } from 'react-dom';
-import styled from '@emotion/styled';
-import colors from 'web-check-live/styles/colors';
-import Button from 'web-check-live/components/Form/Button';
+import React from "react";
+import type { ReactNode } from "react";
+import { createPortal } from "react-dom";
+import styled from "@emotion/styled";
+import colors from "web-check-live/styles/colors";
+import Button from "web-check-live/components/Form/Button";
 
 interface ModalProps {
-  children: ReactNode;
-  isOpen: boolean;
-  closeModal: () => void;
+	children: ReactNode;
+	isOpen: boolean;
+	closeModal: () => void;
 }
 
 const Overlay = styled.div`
@@ -52,41 +52,43 @@ const ModalWindow = styled.div`
 `;
 
 const Modal: React.FC<ModalProps> = ({ children, isOpen, closeModal }) => {
-  const handleOverlayClick = (e: React.MouseEvent<HTMLElement>) => {
-    if (e.target === e.currentTarget) {
-      closeModal();
-    }
-  };
+	const handleOverlayClick = (e: React.MouseEvent<HTMLElement>) => {
+		if (e.target === e.currentTarget) {
+			closeModal();
+		}
+	};
 
-  React.useEffect(() => {
-    const handleEscPress = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        closeModal();
-      }
-    };
+	React.useEffect(() => {
+		const handleEscPress = (e: KeyboardEvent) => {
+			if (e.key === "Escape") {
+				closeModal();
+			}
+		};
 
-    if (isOpen) {
-      window.addEventListener('keydown', handleEscPress);
-    }
+		if (isOpen) {
+			window.addEventListener("keydown", handleEscPress);
+		}
 
-    return () => {
-      window.removeEventListener('keydown', handleEscPress);
-    };
-  }, [isOpen, closeModal]);
+		return () => {
+			window.removeEventListener("keydown", handleEscPress);
+		};
+	}, [isOpen, closeModal]);
 
-  if (!isOpen) {
-    return null;
-  }
+	if (!isOpen) {
+		return null;
+	}
 
-  return createPortal(
-    <Overlay onClick={handleOverlayClick}>
-      <ModalWindow>
-        {children}
-        <Button onClick={closeModal} styles="width: fit-content;float: right;">Close</Button>
-      </ModalWindow>
-    </Overlay>,
-    document.body,
-  );
+	return createPortal(
+		<Overlay onClick={handleOverlayClick}>
+			<ModalWindow>
+				{children}
+				<Button onClick={closeModal} styles="width: fit-content;float: right;">
+					Close
+				</Button>
+			</ModalWindow>
+		</Overlay>,
+		document.body,
+	);
 };
 
 export default Modal;

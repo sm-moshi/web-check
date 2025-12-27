@@ -1,20 +1,20 @@
 ---
-import BaseLayout from '@layouts/Base.astro';
-import Main from '../../web-check-live/main.tsx';
-import '../../web-check-live/styles/index.css';
+import BaseLayout from "@layouts/Base.astro";
+import Main from "../../web-check-live/main.tsx";
+import "../../web-check-live/styles/index.css";
 
 export const prerender = false;
 
 const { pathname, search } = new URL(Astro.request.url);
 
-const encodeUrlForPath = (value: string): string => Buffer.from(value, 'utf8').toString('base64url');
+const encodeUrlForPath = (value: string): string =>
+	Buffer.from(value, "utf8").toString("base64url");
 
-const searchUrl = new URLSearchParams(search).get('url');
+const searchUrl = new URLSearchParams(search).get("url");
 
 if (searchUrl) {
-  Astro.redirect(`/check/${encodeUrlForPath(searchUrl)}`);
+	Astro.redirect(`/check/${encodeUrlForPath(searchUrl)}`);
 }
-
 ---
 
 <BaseLayout>

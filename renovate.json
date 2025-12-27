@@ -1,89 +1,60 @@
 {
-    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-    "extends": [
-        "config:recommended",
-        ":preserveSemverRanges",
-        "group:allNonMajor"
-    ],
-    "platformAutomerge": false,
-    "dependencyDashboard": true,
-    "dependencyDashboardAutoclose": true,
-    "timezone": "Europe/Berlin",
-    "schedule": [
-        "at any time"
-    ],
-    "prHourlyLimit": 3,
-    "prConcurrentLimit": 5,
-    "rangeStrategy": "bump",
-    "enabledManagers": [
-        "dockerfile",
-        "docker-compose",
-        "github-actions",
-        "npm",
-        "mise"
-    ],
-    "labels": [
-        "dependencies"
-    ],
-    "lockFileMaintenance": {
-        "enabled": true,
-        "schedule": [
-            "* 0 * * *"
-        ]
-    },
-    "packageRules": [
-        {
-            "matchManagers": [
-                "npm"
-            ],
-            "groupName": "Node.js dependencies",
-            "groupSlug": "nodejs-dependencies",
-            "separateMinorPatch": true,
-            "labels": [
-                "dependencies",
-                "nodejs"
-            ]
-        },
-        {
-            "matchManagers": [
-                "dockerfile",
-                "docker-compose"
-            ],
-            "groupName": "Docker images",
-            "groupSlug": "docker-images",
-            "separateMinorPatch": true,
-            "labels": [
-                "dependencies",
-                "docker"
-            ]
-        },
-        {
-            "matchManagers": [
-                "github-actions"
-            ],
-            "groupName": "GitHub Actions",
-            "groupSlug": "github-actions",
-            "separateMinorPatch": true,
-            "labels": [
-                "dependencies",
-                "ci"
-            ]
-        },
-        {
-            "matchPackageNames": [
-                "puppeteer",
-                "puppeteer-core"
-            ],
-            "enabled": false
-        },
-        {
-            "matchManagers": [
-                "dockerfile"
-            ],
-            "matchPackageNames": [
-                "node"
-            ],
-            "allowedVersions": "<23"
-        }
-    ]
+	"$schema": "https://docs.renovatebot.com/renovate-schema.json",
+	"extends": [
+		"config:recommended",
+		":preserveSemverRanges",
+		"group:allNonMajor"
+	],
+	"platformAutomerge": false,
+	"dependencyDashboard": true,
+	"dependencyDashboardAutoclose": true,
+	"timezone": "Europe/Berlin",
+	"schedule": ["at any time"],
+	"prHourlyLimit": 3,
+	"prConcurrentLimit": 5,
+	"rangeStrategy": "bump",
+	"enabledManagers": [
+		"dockerfile",
+		"docker-compose",
+		"github-actions",
+		"npm",
+		"mise"
+	],
+	"labels": ["dependencies"],
+	"lockFileMaintenance": {
+		"enabled": true,
+		"schedule": ["* 0 * * *"]
+	},
+	"packageRules": [
+		{
+			"matchManagers": ["npm"],
+			"groupName": "Node.js dependencies",
+			"groupSlug": "nodejs-dependencies",
+			"separateMinorPatch": true,
+			"labels": ["dependencies", "nodejs"]
+		},
+		{
+			"matchManagers": ["dockerfile", "docker-compose"],
+			"groupName": "Docker images",
+			"groupSlug": "docker-images",
+			"separateMinorPatch": true,
+			"labels": ["dependencies", "docker"]
+		},
+		{
+			"matchManagers": ["github-actions"],
+			"groupName": "GitHub Actions",
+			"groupSlug": "github-actions",
+			"separateMinorPatch": true,
+			"labels": ["dependencies", "ci"]
+		},
+		{
+			"matchPackageNames": ["puppeteer", "puppeteer-core"],
+			"enabled": false
+		},
+		{
+			"matchManagers": ["dockerfile"],
+			"matchPackageNames": ["node"],
+			"allowedVersions": "<23"
+		}
+	]
 }

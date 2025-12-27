@@ -1,8 +1,8 @@
-import { Global, css } from '@emotion/react';
+import { Global, css } from "@emotion/react";
 
 const GlobalStyles = () => (
-  <Global
-    styles={css`
+	<Global
+		styles={css`
     @font-face {
       font-family: PTMono;
       font-style: normal;
@@ -17,7 +17,7 @@ const GlobalStyles = () => (
       color: transparent;
     }
     `}
-  />
+	/>
 );
 
 export default GlobalStyles;

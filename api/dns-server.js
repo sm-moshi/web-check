@@ -1,4 +1,4 @@
-import { promises as dnsPromises, lookup } from "node:dns";
+import { promises as dnsPromises } from "node:dns";
 import axios from "axios";
 import middleware from "./_common/middleware.js";
 
@@ -13,7 +13,7 @@ const dnsHandler = async (url) => {
 				try {
 					await axios.get(`https://${address}/dns-query`);
 					dohDirectSupports = true;
-				} catch (error) {
+				} catch (_error) {
 					dohDirectSupports = false;
 				}
 				return {

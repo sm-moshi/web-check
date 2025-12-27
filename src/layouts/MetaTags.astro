@@ -3,28 +3,29 @@
 interface Props {
 	title?: string;
 	description?: string;
-  keywords?: string;
+	keywords?: string;
 	customSchemaJson?: any;
 	breadcrumbs?: Array<{
 		name: string;
 		item: string;
-	}>
+	}>;
 }
 
 // Default meta tag values
 const siteInfo = {
-  title: 'Web Check',
-	titleLong: 'Web Check - X-Ray Vision for any Website',
-  description: 'Web Check is the all-in-one OSINT and security tool, for revealing the inner workings of any website',
-  keywords: '',
-  author: 'Alicia Sykes',
-  twitter: '@Lissy_Sykes',
-  site: import.meta.env.SITE_URL || 'https://web-check.xyz',
-  analytics: {
-    enable: import.meta.env.ENABLE_ANALYTICS,
-    domain: 'web-check.as93.net',
-    script: 'https://no-track.as93.net/js/script.js',
-  },
+	title: "Web Check",
+	titleLong: "Web Check - X-Ray Vision for any Website",
+	description:
+		"Web Check is the all-in-one OSINT and security tool, for revealing the inner workings of any website",
+	keywords: "",
+	author: "Alicia Sykes",
+	twitter: "@Lissy_Sykes",
+	site: import.meta.env.SITE_URL || "https://web-check.xyz",
+	analytics: {
+		enable: import.meta.env.ENABLE_ANALYTICS,
+		domain: "web-check.as93.net",
+		script: "https://no-track.as93.net/js/script.js",
+	},
 };
 
 // Set values for the meta tags, from props or defaults
@@ -43,17 +44,16 @@ const { site, author, twitter, analytics, titleLong } = siteInfo;
 const makeBreadcrumbs = () => {
 	if (!breadcrumbs) return null;
 	return {
-			"@context": "https://schema.org",
-			"@type": "BreadcrumbList",
-			"itemListElement": breadcrumbs.map((breadcrumb, index) => ({
-				"@type": "ListItem",
-				"position": index + 1,
-				"name": breadcrumb.name,
-				"item": `${site}/${breadcrumb.item}`
-			}))
-	}
-}
-
+		"@context": "https://schema.org",
+		"@type": "BreadcrumbList",
+		itemListElement: breadcrumbs.map((breadcrumb, index) => ({
+			"@type": "ListItem",
+			position: index + 1,
+			name: breadcrumb.name,
+			item: `${site}/${breadcrumb.item}`,
+		})),
+	};
+};
 ---
 
 <!-- Core info -->

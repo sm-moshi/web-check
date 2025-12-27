@@ -1,8 +1,7 @@
-
-import styled from '@emotion/styled';
-import { Card } from 'web-check-live/components/Form/Card';
-import Heading from 'web-check-live/components/Form/Heading';
-import colors from 'web-check-live/styles/colors';
+import styled from "@emotion/styled";
+import { Card } from "web-check-live/components/Form/Card";
+import Heading from "web-check-live/components/Form/Heading";
+import colors from "web-check-live/styles/colors";
 
 const cardStyles = `
   grid-row: span 2;
@@ -78,51 +77,76 @@ h4 {
 }
 `;
 
-const TechStackCard = (props: { data: any, title: string, actionButtons: any }): JSX.Element => {
-  const technologies = props.data?.technologies || [];
-  return (
-    <Card heading={props.title} actionButtons={props.actionButtons} styles={cardStyles}>
-      {technologies.length === 0 && (
-        <p>No technologies detected.</p>
-      )}
-      {technologies.map((tech: any, index: number) => {
-        const categories = Array.isArray(tech.categories) ? tech.categories : [];
-        const website = tech.website || '';
-        const iconSrc = typeof tech.icon === 'string'
-          && (tech.icon.startsWith('http') || tech.icon.startsWith('data:'))
-          ? tech.icon
-          : '';
-        return (
-          <TechStackRow key={`tech-stack-row-${index}`}>
-            <div className="r1">
-              <Heading as="h4" size="small">
-                {tech.name}
-                <span className="tech-version">{tech.version ? `(v${tech.version})` : ''}</span>
-              </Heading>
-              <span className="tech-confidence" title={`${tech.confidence}% certain`}>Certainty: {tech.confidence}%</span>
-              <span className="tech-categories">
-                {categories.length
-                  ? categories.map((cat: any, i: number) => `${cat.name}${i < categories.length - 1 ? ', ' : ''}`)
-                  : 'Uncategorized'}
-              </span>
-            </div>
-            <div className="r2">
-              {iconSrc && (
-                <img className="tech-icon" width="10" src={iconSrc} alt={tech.name} />
-              )}
-              <div>
-                <p className="tech-description">{tech.description}</p>
-                {website && (
-                  <p className="tech-website">Learn more at: <a href={website}>{website}</a></p>
-                )}
-              </div>
-            </div>
-
-          </TechStackRow>
-        );
-      })}
-    </Card>
-  );
-}
+const TechStackCard = (props: {
+	data: any;
+	title: string;
+	actionButtons: any;
+}): JSX.Element => {
+	const technologies = props.data?.technologies || [];
+	return (
+		<Card
+			heading={props.title}
+			actionButtons={props.actionButtons}
+			styles={cardStyles}
+		>
+			{technologies.length === 0 && <p>No technologies detected.</p>}
+			{technologies.map((tech: any, index: number) => {
+				const categories = Array.isArray(tech.categories)
+					? tech.categories
+					: [];
+				const website = tech.website || "";
+				const iconSrc =
+					typeof tech.icon === "string" &&
+					(tech.icon.startsWith("http") || tech.icon.startsWith("data:"))
+						? tech.icon
+						: "";
+				return (
+					<TechStackRow key={`tech-stack-row-${index}`}>
+						<div className="r1">
+							<Heading as="h4" size="small">
+								{tech.name}
+								<span className="tech-version">
+									{tech.version ? `(v${tech.version})` : ""}
+								</span>
+							</Heading>
+							<span
+								className="tech-confidence"
+								title={`${tech.confidence}% certain`}
+							>
+								Certainty: {tech.confidence}%
+							</span>
+							<span className="tech-categories">
+								{categories.length
+									? categories.map(
+											(cat: any, i: number) =>
+												`${cat.name}${i < categories.length - 1 ? ", " : ""}`,
+										)
+									: "Uncategorized"}
+							</span>
+						</div>
+						<div className="r2">
+							{iconSrc && (
+								<img
+									className="tech-icon"
+									width="10"
+									src={iconSrc}
+									alt={tech.name}
+								/>
+							)}
+							<div>
+								<p className="tech-description">{tech.description}</p>
+								{website && (
+									<p className="tech-website">
+										Learn more at: <a href={website}>{website}</a>
+									</p>
+								)}
+							</div>
+						</div>
+					</TechStackRow>
+				);
+			})}
+		</Card>
+	);
+};
 
 export default TechStackCard;

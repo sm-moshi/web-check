@@ -27,7 +27,7 @@ const dnsSecHandler = async (domain) => {
 					res.on("end", () => {
 						try {
 							resolve(JSON.parse(data));
-						} catch (error) {
+						} catch (_error) {
 							reject(new Error("Invalid JSON response"));
 						}
 					});

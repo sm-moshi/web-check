@@ -1,32 +1,33 @@
-import dns from 'dns/promises';
-import middleware from './_common/middleware.js';
+import dns from "node:dns/promises";
+import middleware from "./_common/middleware.js";
 
-const txtRecordHandler = async (url, event, context) => {
-  try {
-    const parsedUrl = new URL(url);
+const txtRecordHandler = async (url, _event, _context) => {
+	try {
+		const parsedUrl = new URL(url);
 
-    const txtRecords = await dns.resolveTxt(parsedUrl.hostname);
+		const txtRecords = await dns.resolveTxt(parsedUrl.hostname);
 
-    // Parsing and formatting TXT records into a single object
-    const readableTxtRecords = txtRecords.reduce((acc, recordArray) => {
-      const recordObject = recordArray.reduce((recordAcc, recordString) => {
-        const splitRecord = recordString.split('=');
-        const key = splitRecord[0];
-        const value = splitRecord.slice(1).join('=');
-        return { ...recordAcc, [key]: value };
-      }, {});
-      return { ...acc, ...recordObject };
-    }, {});
+		// Parsing and formatting TXT records into a single object without
+		// repeatedly spreading accumulators (O(n^2)).
+		const readableTxtRecords = {};
+		for (const recordArray of txtRecords) {
+			for (const recordString of recordArray) {
+				const [key, ...rest] = recordString.split("=");
+				const value = rest.join("=");
+				if (key) {
+					readableTxtRecords[key] = value;
+				}
+			}
+		}
 
-    return readableTxtRecords;
-
-  } catch (error) {
-    if (error.code === 'ERR_INVALID_URL') {
-      throw new Error(`Invalid URL ${error}`);
-    } else {
-      throw error;
-    }
-  }
+		return readableTxtRecords;
+	} catch (error) {
+		if (error.code === "ERR_INVALID_URL") {
+			throw new Error(`Invalid URL ${error}`);
+		} else {
+			throw error;
+		}
+	}
 };
 
 export const handler = middleware(txtRecordHandler);
