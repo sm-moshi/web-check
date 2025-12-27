@@ -2,6 +2,8 @@
 
 ARG NODE_VERSION=24.12.0
 ARG DEBIAN_VERSION=trixie-slim
+ARG GO_VERSION=1.25.5
+ARG GO_DEBIAN_VARIANT=trixie
 
 # ----------------------------
 # Build stage
@@ -36,6 +38,22 @@ COPY . .
 RUN yarn build
 
 # ----------------------------
+# Go service build stage
+# ----------------------------
+FROM golang:${GO_VERSION}-${GO_DEBIAN_VARIANT} AS gobuild
+SHELL ["/bin/bash", "-euo", "pipefail", "-c"]
+WORKDIR /src/services/wappalyzergo
+
+# cache deps
+COPY services/wappalyzergo/go.mod ./
+# go.sum absent in repo; download will create it in this stage only
+RUN go mod download
+
+# copy source and build static-ish binary
+COPY services/wappalyzergo ./
+RUN CGO_ENABLED=0 go build -o /out/wappalyzergo
+
+# ----------------------------
 # Runtime stage
 # ----------------------------
 FROM node:${NODE_VERSION}-${DEBIAN_VERSION} AS final
@@ -46,7 +64,8 @@ ENV NODE_ENV=production \
     CHROME_PATH=/usr/bin/chromium \
     PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium \
     PUPPETEER_SKIP_DOWNLOAD=1 \
-    PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=1
+    PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=1 \
+    WAPPALYZERGO_URL=http://127.0.0.1:8080
 
 # runtime deps (chromium is the big one; unavoidable for single-container design)
 RUN apt-get update \
@@ -65,9 +84,12 @@ COPY --from=build /app/dist ./dist
 COPY --from=build /app/public ./public
 COPY --from=build /app/api ./api
 COPY --from=build /app/server.js ./server.js
+COPY --from=gobuild /out/wappalyzergo /usr/local/bin/wappalyzergo
+COPY scripts/docker-entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
 
 USER webcheck
 EXPOSE 3000
 
 ENTRYPOINT ["dumb-init", "--"]
-CMD ["node", "server.js"]
+CMD ["/app/entrypoint.sh"]

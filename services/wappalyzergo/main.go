@@ -56,7 +56,11 @@ func main() {
 			writeJSON(w, http.StatusBadGateway, map[string]string{"error": err.Error()})
 			return
 		}
-		defer response.Body.Close()
+		defer func() {
+			if cerr := response.Body.Close(); cerr != nil {
+				log.Printf("error closing response body: %v", cerr)
+			}
+		}()
 
 		bodyLimit := getEnvInt("MAX_BODY_BYTES", defaultBodyLimit)
 		body, err := io.ReadAll(io.LimitReader(response.Body, int64(bodyLimit)))

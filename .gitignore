@@ -12,8 +12,6 @@
 #         BUILT FILES
 # ------------------------
 dist/
-.vercel/
-.netlify/
 .webpack/
 .serverless/
 .astro/

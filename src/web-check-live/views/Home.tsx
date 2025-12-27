@@ -1,17 +1,22 @@
-import styled from '@emotion/styled';
-import { type ChangeEvent, type FormEvent, useState, useEffect } from 'react';
-import { Link, useNavigate, useLocation, type NavigateOptions } from 'react-router';
+import styled from "@emotion/styled";
+import { type ChangeEvent, type FormEvent, useState, useEffect } from "react";
+import {
+	Link,
+	useNavigate,
+	useLocation,
+	type NavigateOptions,
+} from "react-router";
 
-import Heading from 'web-check-live/components/Form/Heading';
-import Input from 'web-check-live/components/Form/Input'
-import Button from 'web-check-live/components/Form/Button';
-import { StyledCard } from 'web-check-live/components/Form/Card';
-import Footer from 'web-check-live/components/misc/Footer';
-import FancyBackground from 'web-check-live/components/misc/FancyBackground';
+import Heading from "web-check-live/components/Form/Heading";
+import Input from "web-check-live/components/Form/Input";
+import Button from "web-check-live/components/Form/Button";
+import { StyledCard } from "web-check-live/components/Form/Card";
+import Footer from "web-check-live/components/misc/Footer";
+import FancyBackground from "web-check-live/components/misc/FancyBackground";
 
-import docs from 'web-check-live/utils/docs';
-import colors from 'web-check-live/styles/colors';
-import { determineAddressType } from 'web-check-live/utils/address-type-checker';
+import docs from "web-check-live/utils/docs";
+import colors from "web-check-live/styles/colors";
+import { determineAddressType } from "web-check-live/utils/address-type-checker";
 
 const HomeContainer = styled.section`
   display: flex;
@@ -138,178 +143,204 @@ const SiteFeaturesWrapper = styled(StyledCard)`
 `;
 
 const Home = (): JSX.Element => {
-  const defaultPlaceholder = 'e.g. https://duck.com/';
-  const [userInput, setUserInput] = useState('');
-  const [errorMsg, setErrMsg] = useState('');
-  const [placeholder] = useState(defaultPlaceholder);
-  const [inputDisabled] = useState(false);
-  const navigate = useNavigate();
+	const defaultPlaceholder = "e.g. https://duck.com/";
+	const [userInput, setUserInput] = useState("");
+	const [errorMsg, setErrMsg] = useState("");
+	const [placeholder] = useState(defaultPlaceholder);
+	const [inputDisabled] = useState(false);
+	const navigate = useNavigate();
 
-  const location = useLocation();
+	const location = useLocation();
 
-  const encodeUrlForPath = (value: string): string => {
-    if (typeof globalThis.btoa !== 'function') {
-      const buffer = (globalThis as any).Buffer;
-      return buffer.from(value, 'utf8').toString('base64url');
-    }
-    const bytes = new TextEncoder().encode(value);
-    let binary = '';
-    bytes.forEach((byte) => {
-      binary += String.fromCharCode(byte);
-    });
-    const base64 = globalThis.btoa(binary);
-    return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-  };
+	const encodeUrlForPath = (value: string): string => {
+		if (typeof globalThis.btoa !== "function") {
+			const buffer = (globalThis as any).Buffer;
+			return buffer.from(value, "utf8").toString("base64url");
+		}
+		const bytes = new TextEncoder().encode(value);
+		let binary = "";
+		bytes.forEach((byte) => {
+			binary += String.fromCharCode(byte);
+		});
+		const base64 = globalThis.btoa(binary);
+		return base64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+	};
 
-  /* Redirect strait to results, if somehow we land on /check?url=[] */
-  useEffect(() => {
-    const query = new URLSearchParams(location.search);
-    const urlFromQuery = query.get('url');
-    if (urlFromQuery) {
-      navigate(`/check/${encodeUrlForPath(urlFromQuery)}`, { replace: true });
-    }
-  }, [navigate, location.search]);
+	/* Redirect strait to results, if somehow we land on /check?url=[] */
+	useEffect(() => {
+		const query = new URLSearchParams(location.search);
+		const urlFromQuery = query.get("url");
+		if (urlFromQuery) {
+			navigate(`/check/${encodeUrlForPath(urlFromQuery)}`, { replace: true });
+		}
+	}, [navigate, location.search]);
 
-  /* Check is valid address, either show err or redirect to results page */
-  const submit = () => {
-    let address = userInput.endsWith("/") ? userInput.slice(0, -1) : userInput;
-    const addressType = determineAddressType(address);
+	/* Check is valid address, either show err or redirect to results page */
+	const submit = () => {
+		let address = userInput.endsWith("/") ? userInput.slice(0, -1) : userInput;
+		const addressType = determineAddressType(address);
 
-    if (addressType === 'empt') {
-      setErrMsg('Field must not be empty');
-    } else if (addressType === 'err') {
-      setErrMsg('Must be a valid URL, IPv4 or IPv6 Address');
-    } else {
-      // if the addressType is 'url' and address doesn't start with 'http://' or 'https://', prepend 'https://'
-      if (addressType === 'url' && !/^https?:\/\//i.test(address)) {
-        address = 'https://' + address;
-      }
-      const resultRouteParams: NavigateOptions = { state: { address, addressType } };
-      navigate(`/check/${encodeUrlForPath(address)}`, resultRouteParams);
-    }
-  };
+		if (addressType === "empt") {
+			setErrMsg("Field must not be empty");
+		} else if (addressType === "err") {
+			setErrMsg("Must be a valid URL, IPv4 or IPv6 Address");
+		} else {
+			// if the addressType is 'url' and address doesn't start with 'http://' or 'https://', prepend 'https://'
+			if (addressType === "url" && !/^https?:\/\//i.test(address)) {
+				address = "https://" + address;
+			}
+			const resultRouteParams: NavigateOptions = {
+				state: { address, addressType },
+			};
+			navigate(`/check/${encodeUrlForPath(address)}`, resultRouteParams);
+		}
+	};
 
+	/* Update user input state, and hide error message if field is valid */
+	const inputChange = (event: ChangeEvent<HTMLInputElement>) => {
+		setUserInput(event.target.value);
+		const isError = ["err", "empt"].includes(
+			determineAddressType(event.target.value),
+		);
+		if (!isError) setErrMsg("");
+	};
 
-  /* Update user input state, and hide error message if field is valid */
-  const inputChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setUserInput(event.target.value);
-    const isError = ['err', 'empt'].includes(determineAddressType(event.target.value));
-    if (!isError) setErrMsg('');
-  };
+	const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
+		if (event.key === "Enter") {
+			event.preventDefault();
+			submit();
+		}
+	};
 
-  const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'Enter') {
-      event.preventDefault();
-      submit();
-    }
-  };
+	const formSubmitEvent = (event: FormEvent<HTMLFormElement>) => {
+		event.preventDefault();
+		submit();
+	};
 
-  const formSubmitEvent = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    submit();
-  }
+	// const findIpAddress = () => {
+	//   setUserInput('');
+	//   setPlaceholder('Looking up your IP...');
+	//   setInputDisabled(true);
+	//   fetch('https://ipapi.co/json/')
+	//     .then(function(response) {
+	//       response.json().then(jsonData => {
+	//         setUserInput(jsonData.ip);
+	//         setPlaceholder(defaultPlaceholder);
+	//         setInputDisabled(true);
+	//       });
+	//     })
+	//     .catch(function(error) {
+	//       console.log('Failed to get IP address :\'(', error)
+	//     });
+	// };
 
-  // const findIpAddress = () => {
-  //   setUserInput('');
-  //   setPlaceholder('Looking up your IP...');
-  //   setInputDisabled(true);
-  //   fetch('https://ipapi.co/json/')
-  //     .then(function(response) {
-  //       response.json().then(jsonData => {
-  //         setUserInput(jsonData.ip);
-  //         setPlaceholder(defaultPlaceholder);
-  //         setInputDisabled(true);
-  //       });
-  //     })
-  //     .catch(function(error) {
-  //       console.log('Failed to get IP address :\'(', error)
-  //     });
-  // };
-
-
-  return (
-    <HomeContainer>
-      <FancyBackground />
-      <UserInputMain onSubmit={formSubmitEvent}>
-        <a href="/">
-          <Heading as="h1" size="xLarge" align="center" color={colors.primary}>
-            <img width="64" src="/web-check.png" alt="Web Check Icon" />
-            Web Check
-          </Heading>
-        </a>
-        <Input
-          id="user-input"
-          value={userInput}
-          label="Enter a URL"
-          size="large"
-          orientation="vertical"
-          name="url"
-          placeholder={placeholder}
-          disabled={inputDisabled}
-          handleChange={inputChange}
-          handleKeyDown={handleKeyPress}
-        />
-        {/* <FindIpButton onClick={findIpAddress}>Or, find my IP</FindIpButton> */}
-        {errorMsg && <ErrorMessage>{errorMsg}</ErrorMessage>}
-        <Button type="submit" styles="width: calc(100% - 1rem);" size="large" onClick={submit}>Analyze!</Button>
-      </UserInputMain>
-      <SponsorCard>
-        <Heading as="h2" size="small" color={colors.primary}>Sponsored by</Heading>
-        <div className="inner">
-          <p>
-            <a
-              target="_blank"
-              rel="noreferrer"
-              href="https://terminaltrove.com/?utm_campaign=github&utm_medium=referral&utm_content=web-check&utm_source=wcgh"
-            >
-              Terminal Trove
-            </a> - The $HOME of all things in the terminal.
-            <br />
-            <span className="cta">
-              Get updates on the latest CLI/TUI tools via
-              the <a
-                target="_blank"
-                rel="noreferrer"
-                className="cta"
-                href="https://terminaltrove.com/newsletter?utm_campaign=github&utm_medium=referral&utm_content=web-check&utm_source=wcgh"
-              >
-                Terminal Trove newsletter
-              </a>
-            </span>
-
-          </p>
-          <a
-            target="_blank"
-            rel="noreferrer"
-            href="https://terminaltrove.com/?utm_campaign=github&utm_medium=referral&utm_content=web-check&utm_source=wcgh">
-            <img width="120" alt="Terminal Trove" src="https://i.ibb.co/NKtYjJ1/terminal-trove-web-check.png" />
-          </a>
-        </div>
-
-      </SponsorCard>
-      <SiteFeaturesWrapper>
-        <div className="features">
-          <Heading as="h2" size="small" color={colors.primary}>Supported Checks</Heading>
-          <ul>
-            {docs.map((doc, index) => (<li key={index}>{doc.title}</li>))}
-            <li><Link to="/check/about">+ more!</Link></li>
-          </ul>
-        </div>
-        <div className="links">
-          <a target="_blank" rel="noreferrer" href="https://github.com/lissy93/web-check (& https://github.com/sm-moshi/web-check)" title="Check out the source code and documentation on GitHub, and get support or contribute">
-            <Button>View on GitHub</Button>
-          </a>
-          <a target="_blank" rel="noreferrer" href="https://app.netlify.com/start/deploy?repository=https://github.com/lissy93/web-check" title="Deploy your own private or public instance of Web-Check to Netlify">
-            <Button>Deploy your own</Button>
-          </a>
-          <Link to="/check/about#api-documentation" title="View the API documentation, to use Web-Check programmatically">
-            <Button>API Docs</Button>
-          </Link>
-        </div>
-      </SiteFeaturesWrapper>
-      <Footer isFixed={true} />
-    </HomeContainer>
-  );
-}
+	return (
+		<HomeContainer>
+			<FancyBackground />
+			<UserInputMain onSubmit={formSubmitEvent}>
+				<a href="/">
+					<Heading as="h1" size="xLarge" align="center" color={colors.primary}>
+						<img width="64" src="/web-check.png" alt="Web Check Icon" />
+						Web Check
+					</Heading>
+				</a>
+				<Input
+					id="user-input"
+					value={userInput}
+					label="Enter a URL"
+					size="large"
+					orientation="vertical"
+					name="url"
+					placeholder={placeholder}
+					disabled={inputDisabled}
+					handleChange={inputChange}
+					handleKeyDown={handleKeyPress}
+				/>
+				{/* <FindIpButton onClick={findIpAddress}>Or, find my IP</FindIpButton> */}
+				{errorMsg && <ErrorMessage>{errorMsg}</ErrorMessage>}
+				<Button
+					type="submit"
+					styles="width: calc(100% - 1rem);"
+					size="large"
+					onClick={submit}
+				>
+					Analyze!
+				</Button>
+			</UserInputMain>
+			<SponsorCard>
+				<Heading as="h2" size="small" color={colors.primary}>
+					Sponsored by
+				</Heading>
+				<div className="inner">
+					<p>
+						<a
+							target="_blank"
+							rel="noreferrer"
+							href="https://terminaltrove.com/?utm_campaign=github&utm_medium=referral&utm_content=web-check&utm_source=wcgh"
+						>
+							Terminal Trove
+						</a>{" "}
+						- The $HOME of all things in the terminal.
+						<br />
+						<span className="cta">
+							Get updates on the latest CLI/TUI tools via the{" "}
+							<a
+								target="_blank"
+								rel="noreferrer"
+								className="cta"
+								href="https://terminaltrove.com/newsletter?utm_campaign=github&utm_medium=referral&utm_content=web-check&utm_source=wcgh"
+							>
+								Terminal Trove newsletter
+							</a>
+						</span>
+					</p>
+					<a
+						target="_blank"
+						rel="noreferrer"
+						href="https://terminaltrove.com/?utm_campaign=github&utm_medium=referral&utm_content=web-check&utm_source=wcgh"
+					>
+						<img
+							width="120"
+							alt="Terminal Trove"
+							src="https://i.ibb.co/NKtYjJ1/terminal-trove-web-check.png"
+						/>
+					</a>
+				</div>
+			</SponsorCard>
+			<SiteFeaturesWrapper>
+				<div className="features">
+					<Heading as="h2" size="small" color={colors.primary}>
+						Supported Checks
+					</Heading>
+					<ul>
+						{docs.map((doc, index) => (
+							<li key={index}>{doc.title}</li>
+						))}
+						<li>
+							<Link to="/check/about">+ more!</Link>
+						</li>
+					</ul>
+				</div>
+				<div className="links">
+					<a
+						target="_blank"
+						rel="noreferrer"
+						href="https://github.com/lissy93/web-check (& https://github.com/sm-moshi/web-check)"
+						title="Check out the source code and documentation on GitHub, and get support or contribute"
+					>
+						<Button>View on GitHub</Button>
+					</a>
+					<Link
+						to="/check/about#api-documentation"
+						title="View the API documentation, to use Web-Check programmatically"
+					>
+						<Button>API Docs</Button>
+					</Link>
+				</div>
+			</SiteFeaturesWrapper>
+			<Footer isFixed={true} />
+		</HomeContainer>
+	);
+};
 
 export default Home;
