@@ -109,7 +109,7 @@ jobs:
         run: aws s3 sync ./build/ s3://$AWS_S3_BUCKET/ --delete
 
       - name: Invalidate CloudFront cache
-        uses: chetan/invalidate-cloudfront-action@c384d5f09592318a77b1e5c0c8d4772317e48b25 # v2
+        uses: chetan/invalidate-cloudfront-action@12d242edc7752fca9140c2034be28792ad22c5a8 # v2
         env:
           DISTRIBUTION: E30XKAM2TG9FD8
           PATHS: '/*'
