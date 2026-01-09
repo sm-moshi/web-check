@@ -6510,10 +6510,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"globals@npm:^16.5.0":
-  version: 16.5.0
-  resolution: "globals@npm:16.5.0"
-  checksum: 10c0/615241dae7851c8012f5aa0223005b1ed6607713d6813de0741768bd4ddc39353117648f1a7086b4b0fa45eae733f1c0a0fe369aa4e543bb63f8de8990178ea9
+"globals@npm:^17.0.0":
+  version: 17.0.0
+  resolution: "globals@npm:17.0.0"
+  checksum: 10c0/e3c169fdcb0fc6755707b697afb367bea483eb29992cfc0de1637382eb893146e17f8f96db6d7453e3696b478a7863ae2000e6c71cd2f4061410285106d3847a
   languageName: node
   linkType: hard
 
@@ -9561,7 +9561,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-router@npm:7.11.0, react-router@npm:^7.11.0":
+"react-router@npm:7.11.0":
   version: 7.11.0
   resolution: "react-router@npm:7.11.0"
   dependencies:
@@ -9574,6 +9574,22 @@ __metadata:
     react-dom:
       optional: true
   checksum: 10c0/eb3693d63d1c52221a3449de5db170e2fa9e00536b011998b17f8a277f8b5e89b752d104dbbeb4ee3d474f8e4570167db00293b4510f63277e5e6658c5dab22b
+  languageName: node
+  linkType: hard
+
+"react-router@npm:^7.12.0":
+  version: 7.12.0
+  resolution: "react-router@npm:7.12.0"
+  dependencies:
+    cookie: "npm:^1.0.1"
+    set-cookie-parser: "npm:^2.6.0"
+  peerDependencies:
+    react: ">=18"
+    react-dom: ">=18"
+  peerDependenciesMeta:
+    react-dom:
+      optional: true
+  checksum: 10c0/abde366f716cb3961a5a390c278375c0591bace5773e1b4420001f0a913b4dd53d490e7dea866acebcac2c0fa07378aa83702769d449449027406ed517a8ea00
   languageName: node
   linkType: hard
 
@@ -12147,7 +12163,7 @@ __metadata:
     express: "npm:^5.2.1"
     express-rate-limit: "npm:^8.2.1"
     framer-motion: "npm:^12.23.26"
-    globals: "npm:^16.5.0"
+    globals: "npm:^17.0.0"
     got: "npm:^14.6.5"
     jiti: "npm:^2.6.1"
     nodemon: "npm:^3.1.11"
@@ -12157,7 +12173,7 @@ __metadata:
     react: "npm:^19.2.3"
     react-dom: "npm:^19.2.3"
     react-masonry-css: "npm:^1.0.16"
-    react-router: "npm:^7.11.0"
+    react-router: "npm:^7.12.0"
     react-router-dom: "npm:^7.11.0"
     react-simple-maps: "npm:^4.0.0-beta.6"
     react-toastify: "npm:^11.0.5"
